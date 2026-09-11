@@ -1111,15 +1111,16 @@ body.drawer-open {
         rgba(8, 8, 7, 0.10);
 }
 
+/*
+ * Clinical assessment card: white throughout (outer card, header area,
+ * description area, and the "10 inputs"/"1 result" tiles). Brand text,
+ * accent, border, and icon colors are preserved.
+ */
 .assessment-summary {
     padding: 36px;
 
     background:
-        linear-gradient(
-            180deg,
-            rgba(15, 93, 143, 0.04),
-            #ffffff 55%
-        );
+        #ffffff;
 }
 
 .assessment-summary h2 {
@@ -1161,7 +1162,11 @@ body.drawer-open {
 
     padding: 18px;
 
-    background: #eef8f8;
+    background: #ffffff;
+
+    border:
+        1px solid
+        rgba(8, 8, 7, 0.08);
 }
 
 .summary-metrics strong,

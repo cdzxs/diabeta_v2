@@ -29,17 +29,17 @@
             .replace(/'/g, "&#039;");
     }
 
-    function saveCurrentResult() {
-        const result = window.DIABETA_RESULT;
-        if (!result) return;
-
-        const records = readRecords();
-        records.unshift(result);
-        writeRecords(records.slice(0, 50));
+    function personRows(person) {
+        // Stage 1 is the five-input screener only; never surface lab placeholders
+        return Object.entries(person || {}).filter(
+            ([label, value]) =>
+                !(label === "HbA1c" && value === "Not provided") &&
+                !(label === "Fasting Glucose" && value === "Not provided")
+        );
     }
 
     function buildReportHtml(record) {
-        const detailRows = Object.entries(record.person || {})
+        const detailRows = personRows(record.person)
             .map(([label, value]) => `<tr><th>${escapeHtml(label)}</th><td>${escapeHtml(value)}</td></tr>`)
             .join("");
 
@@ -130,7 +130,7 @@
     }
 
     function buildRecordPreview(record, index) {
-        const detailRows = Object.entries(record.person || {})
+        const detailRows = personRows(record.person)
             .map(([label, value]) => `
                 <div>
                     <dt>${escapeHtml(label)}</dt>
@@ -185,7 +185,7 @@
                 <div class="empty-state">
                     <h2>No records yet</h2>
                     <p>Run an assessment and the result will appear here automatically.</p>
-                    <a class="primary-link" href="/?assessment=1">Start Assessment</a>
+                    <a class="primary-link" href="stage1.html">Start Assessment</a>
                 </div>`;
             return;
         }
@@ -200,6 +200,7 @@
                 <div class="record-actions">
                     <button class="secondary-action" type="button" data-view-record="${index}">View</button>
                     <button class="secondary-action" type="button" data-record-index="${index}">Download PDF</button>
+                    <button class="secondary-action danger-action" type="button" data-delete-record="${index}">Delete</button>
                 </div>
             </article>
         `).join("");
@@ -218,9 +219,24 @@
                 if (record) downloadRecord(record);
             });
         });
+
+        list.querySelectorAll("[data-delete-record]").forEach((button) => {
+            button.addEventListener("click", () => {
+                const index = Number(button.dataset.deleteRecord);
+                if (!window.confirm("Delete this record?")) return;
+                const records = readRecords();
+                if (index < 0 || index >= records.length) return;
+                records.splice(index, 1);
+                writeRecords(records);
+                renderRecords();
+            });
+        });
     }
 
-    saveCurrentResult();
+    // Records are saved exactly once, by the Stage 1 submit handler
+    // (stage1.html) at assessment time. result.html only READS
+    // diabeta_last_result to display the outcome - it must not write a
+    // second copy into diabetaRecords.
     renderRecords();
 
     document.querySelector("[data-download-current]")?.addEventListener("click", () => {
@@ -229,6 +245,7 @@
 
     document.querySelectorAll("[data-clear-records]").forEach((button) => {
         button.addEventListener("click", () => {
+            if (!window.confirm("Clear all saved assessment records? This cannot be undone.")) return;
             localStorage.removeItem(storageKey);
             closeRecordModal();
             renderRecords();

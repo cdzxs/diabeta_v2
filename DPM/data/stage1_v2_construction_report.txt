@@ -1,0 +1,93 @@
+======================================================================
+DIA BETA V2 - STAGE 1 (8-PREDICTOR) NHANES DATASET REPORT
+======================================================================
+
+DATA SOURCE
+----------------------------------------------------------------------
+NHANES 2013-2014, 2015-2016, 2017-2018 (CDC)
+Files: DEMO, BMX, DIQ, MCQ, BPQ, PAQ, SMQ, GHB, GLU
+
+COHORT
+----------------------------------------------------------------------
+Adults age >= 20 (18-19 excluded: MCQ300C family-history
+variable is not asked for that age range).
+
+PREDICTORS (8, non-laboratory only)
+----------------------------------------------------------------------
+  - age
+  - sex
+  - bmi
+  - race_ethnicity
+  - family_history
+  - hypertension
+  - physical_activity
+  - smoking_status
+
+LABORATORY VARIABLES
+----------------------------------------------------------------------
+HbA1c (LBXGH) and fasting glucose (LBXGLU) are NOT predictors.
+They are used ONLY to construct the training target.
+No laboratory column is saved in the dataset.
+
+TARGET (diabetes_risk, 3-class)
+----------------------------------------------------------------------
+  High     = DIQ010==1 OR HbA1c>=6.5 OR fasting glucose>=126
+  Moderate = not High AND (DIQ010==3 OR 5.7<=HbA1c<=6.4 OR 100<=FG<=125)
+  Low      = not High/Moderate AND (DIQ010==2 OR >=1 valid lab)
+Either lab is used independently (fasting glucose is a subsample).
+Undetermined targets are excluded, never assigned arbitrarily.
+
+FINAL DATASET
+----------------------------------------------------------------------
+  Rows: 16,327
+  Predictors: 8
+  Columns: 12
+
+TARGET CLASS DISTRIBUTION
+----------------------------------------------------------------------
+  Low: 7,759 (47.52%)
+  Moderate: 5,507 (33.73%)
+  High: 3,061 (18.75%)
+
+MISSINGNESS - FINAL SUPERVISED DATASET
+----------------------------------------------------------------------
+  age: 0 (0.00%)
+  sex: 0 (0.00%)
+  bmi: 226 (1.38%)
+  race_ethnicity: 0 (0.00%)
+  family_history: 292 (1.79%)
+  hypertension: 19 (0.12%)
+  physical_activity: 3 (0.02%)
+  smoking_status: 12 (0.07%)
+
+MISSINGNESS - COHORT (before target filtering)
+----------------------------------------------------------------------
+  Cohort rows: 16,327
+  age: 0 (0.00%)
+  sex: 0 (0.00%)
+  bmi: 226 (1.38%)
+  race_ethnicity: 0 (0.00%)
+  family_history: 292 (1.79%)
+  hypertension: 19 (0.12%)
+  physical_activity: 3 (0.02%)
+  smoking_status: 12 (0.07%)
+  diabetes_risk (undetermined): 0 (0.00%)
+  HbA1c available:   15,611 (95.6%)
+  Fasting glucose available: 7,461 (45.7%)
+  Both labs: 7,455 | Neither lab: 710
+
+PARTICIPANTS EXCLUDED
+----------------------------------------------------------------------
+  Target undetermined (no diagnosis answer AND no valid lab): 0
+  (Age 18-19 and non-adults are filtered inside each cycle;
+   invalid sex/race codes are filtered as data hygiene.)
+
+CYCLES REPRESENTED
+----------------------------------------------------------------------
+  2013-2014: 5,588
+  2015-2016: 5,474
+  2017-2018: 5,265
+
+======================================================================
+END OF REPORT
+======================================================================

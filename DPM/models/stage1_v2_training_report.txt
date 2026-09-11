@@ -1,0 +1,145 @@
+======================================================================
+DIA BETA V2 - STAGE 1 SCREENER TRAINING (v2, 8 predictors)
+======================================================================
+
+Dataset: stage1_v2_nhanes_8predictors.csv
+Rows: 16,327
+Predictors (8): age, sex, bmi, race_ethnicity, family_history, hypertension, physical_activity, smoking_status
+Target: diabetes_risk  (Low, Moderate, High)
+Leakage guards: diq010/SEQN/cycle/labs excluded from X - VERIFIED
+  Low: 7,759 (47.52%)
+  Moderate: 5,507 (33.73%)
+  High: 3,061 (18.75%)
+
+Train/test split: 13,061 / 3,266 (stratified, random_state=42)
+
+Missing-value handling (fitted on training folds only):
+  Numeric (age, bmi): median imputation + standardization
+  Categorical (sex, race_ethnicity, family_history, hypertension, physical_activity, smoking_status): most-frequent imputation + one-hot encoding
+  Missing predictor values are NOT dropped; imputers are learned per fold.
+
+Candidates evaluated: RandomForest, XGBoost, HistGradientBoosting, RandomForest+SMOTE
+SMOTE: tested as one candidate inside the CV pipeline only (RandomForest+SMOTE); never applied to validation/test.
+
+======================================================================
+CROSS-VALIDATION (model selection)
+======================================================================
+  RandomForest             CV macro-F1=0.4740 (+/-0.0125)  recall=0.4733  acc=0.5157  ROC-AUC(ovr)=0.6861  (6s)
+  XGBoost                  CV macro-F1=0.4843 (+/-0.0138)  recall=0.4828  acc=0.5235  ROC-AUC(ovr)=0.6942  (4s)
+  HistGradientBoosting     CV macro-F1=0.5173 (+/-0.0114)  recall=0.5154  acc=0.5558  ROC-AUC(ovr)=0.7355  (4s)
+  RandomForest+SMOTE       CV macro-F1=0.4778 (+/-0.0131)  recall=0.4843  acc=0.5070  ROC-AUC(ovr)=0.6829  (8s)
+
+  SELECTED by CV macro-F1: HistGradientBoosting
+
+======================================================================
+FINAL HELD-OUT TEST EVALUATION (per candidate)
+======================================================================
+
+  RandomForest
+----------------------------------------------------------------------
+  Accuracy:          0.5168
+  Macro Precision:   0.4779
+  Macro Recall:      0.4752
+  Macro F1:          0.4756
+  ROC-AUC (macro ovr): 0.6914
+  Per-class (Precision / Recall / F1):
+    Low       0.6224 / 0.6817 / 0.6507   (n=1552)
+    Moderate  0.3934 / 0.3566 / 0.3741   (n=1102)
+    High      0.4180 / 0.3873 / 0.4020   (n=612)
+  Confusion matrix (rows=true, cols=pred, order Low/Moderate/High):
+    Low         1058    383    111
+    Moderate     490    393    219
+    High         152    223    237
+
+  XGBoost
+----------------------------------------------------------------------
+  Accuracy:          0.5429
+  Macro Precision:   0.5078
+  Macro Recall:      0.5012
+  Macro F1:          0.5034
+  ROC-AUC (macro ovr): 0.7095
+  Per-class (Precision / Recall / F1):
+    Low       0.6404 / 0.7010 / 0.6693   (n=1552)
+    Moderate  0.4270 / 0.3956 / 0.4107   (n=1102)
+    High      0.4560 / 0.4069 / 0.4301   (n=612)
+  Confusion matrix (rows=true, cols=pred, order Low/Moderate/High):
+    Low         1088    354    110
+    Moderate     479    436    187
+    High         132    231    249
+
+  HistGradientBoosting
+----------------------------------------------------------------------
+  Accuracy:          0.5735
+  Macro Precision:   0.5390
+  Macro Recall:      0.5305
+  Macro F1:          0.5331
+  ROC-AUC (macro ovr): 0.7468
+  Per-class (Precision / Recall / F1):
+    Low       0.6699 / 0.7468 / 0.7063   (n=1552)
+    Moderate  0.4443 / 0.4020 / 0.4221   (n=1102)
+    High      0.5028 / 0.4428 / 0.4709   (n=612)
+  Confusion matrix (rows=true, cols=pred, order Low/Moderate/High):
+    Low         1159    307     86
+    Moderate     477    443    182
+    High          94    247    271
+
+  RandomForest+SMOTE
+----------------------------------------------------------------------
+  Accuracy:          0.5141
+  Macro Precision:   0.4810
+  Macro Recall:      0.4916
+  Macro F1:          0.4849
+  ROC-AUC (macro ovr): 0.6891
+  Per-class (Precision / Recall / F1):
+    Low       0.6527 / 0.6334 / 0.6429   (n=1552)
+    Moderate  0.3967 / 0.3693 / 0.3825   (n=1102)
+    High      0.3937 / 0.4722 / 0.4294   (n=612)
+  Confusion matrix (rows=true, cols=pred, order Low/Moderate/High):
+    Low          983    410    159
+    Moderate     409    407    286
+    High         114    209    289
+
+======================================================================
+MODEL SELECTION SUMMARY
+======================================================================
+Candidate                    CV F1   Test F1  Test rec   Mod F1  High F1
+RandomForest                0.4740    0.4756    0.4752   0.3741   0.4020
+XGBoost                     0.4843    0.5034    0.5012   0.4107   0.4301
+HistGradientBoosting        0.5173    0.5331    0.5305   0.4221   0.4709
+RandomForest+SMOTE          0.4778    0.4849    0.4916   0.3825   0.4294
+
+BEST MODEL (CV macro-F1): HistGradientBoosting
+
+Saved pipeline: C:\Users\samuel ucheoma\Documents\ML_Project\diabeta\diabeta\DPM\models\stage1_v2_model.pkl
+Saved test predictions: C:\Users\samuel ucheoma\Documents\ML_Project\diabeta\diabeta\DPM\models\stage1_v2_test_predictions.csv
+
+======================================================================
+FINAL SELECTED MODEL - HELD-OUT TEST PERFORMANCE
+======================================================================
+Model: HistGradientBoosting
+
+  HistGradientBoosting
+----------------------------------------------------------------------
+  Accuracy:          0.5735
+  Macro Precision:   0.5390
+  Macro Recall:      0.5305
+  Macro F1:          0.5331
+  ROC-AUC (macro ovr): 0.7468
+  Per-class (Precision / Recall / F1):
+    Low       0.6699 / 0.7468 / 0.7063   (n=1552)
+    Moderate  0.4443 / 0.4020 / 0.4221   (n=1102)
+    High      0.5028 / 0.4428 / 0.4709   (n=612)
+  Confusion matrix (rows=true, cols=pred, order Low/Moderate/High):
+    Low         1159    307     86
+    Moderate     477    443    182
+    High          94    247    271
+
+OBSERVATIONS / LIMITATIONS
+----------------------------------------------------------------------
+1. Class imbalance is mild (Low:Moderate:High = 47.5%:33.7%:18.8%, max ratio ~2.5:1); SMOTE was evaluated as a candidate inside CV only.
+2. The pipeline is a single loadable artifact: preprocessing and
+   classifier are identical at training and inference time.
+3. This model is NOT yet integrated into the application; the frozen
+   DPM/models/diabeta_dataset1_model.pkl remains untouched.
+
+Total elapsed: 28s

@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage 2: Risk Assessment — DiaBeta V2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Playfair+Display:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .stage2-container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 24px 20px 60px;
+        }
+        .stage2-badge {
+            display: inline-block;
+            background: #0e2f56;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+        }
+        .stage1-import-card {
+            background: #f0f7fd;
+            border: 1px solid #c9e0f5;
+            border-left: 6px solid #1767b3;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .stage1-import-info p {
+            margin: 0 0 4px;
+            font-size: 14px;
+            color: #0e2f56;
+            font-weight: 600;
+        }
+        .stage1-import-values {
+            font-size: 13px;
+            color: #4a5c6e;
+            margin: 0;
+        }
+        .stage1-import-toggle {
+            background: transparent;
+            border: 1px solid #1767b3;
+            color: #1767b3;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .stage1-import-toggle:hover {
+            background: #1767b3;
+            color: #ffffff;
+        }
+        .stage2-result-card {
+            background: #ffffff;
+            border: 2px solid #0e2f56;
+            border-radius: 12px;
+            padding: 32px 28px;
+            margin-top: 32px;
+            box-shadow: 0 8px 30px rgba(14, 47, 86, 0.08);
+        }
+        .tier-hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            border-bottom: 1px solid #e6edf2;
+            padding-bottom: 24px;
+            margin-bottom: 24px;
+        }
+        .tier-badge {
+            display: inline-block;
+            font-size: 15px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 8px 18px;
+            border-radius: 24px;
+            margin-bottom: 10px;
+        }
+        .tier-badge.tier-low {
+            background: #e6f7ee;
+            color: #1e7a45;
+        }
+        .tier-badge.tier-moderate {
+            background: #fdf3e3;
+            color: #9a6a00;
+        }
+        .tier-badge.tier-high {
+            background: #fdeaea;
+            color: #b02a37;
+        }
+        .stage2-score-number {
+            font-size: 44px;
+            font-weight: 800;
+            color: #0e2f56;
+            font-family: 'Playfair Display', Georgia, serif;
+            line-height: 1;
+        }
+        .stage2-score-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #607084;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-top: 6px;
+        }
+        .stage2-disclaimer {
+            background: #fdf5e6;
+            border-left: 4px solid #f0b429;
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #5c4300;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+        .reason-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .reason-list li {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            font-size: 14px;
+            color: #33475b;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        .reason-list li::before {
+            content: "•";
+            color: #1767b3;
+            font-weight: 800;
+        }
+        .stage2-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+        .prefilled-badge {
+            font-size: 11px;
+            color: #1767b3;
+            background: #e1effa;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+            margin-left: 6px;
+        }
+        /* Laboratory values are grouped in ONE visually distinct container.
+           The "At least one required" instruction is displayed once, at the
+           container heading, and applies to both HbA1c and Fasting Glucose. */
+        .lab-values-group {
+            margin-top: 18px;
+            background: #eef4fa;
+            border: 1px solid #c9ddf0;
+            border-left: 5px solid #1767b3;
+            border-radius: 12px;
+            padding: 18px 18px 22px;
+        }
+        .lab-group-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .lab-group-title {
+            color: #0e2f56;
+            font-size: 0.95rem;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+        }
+        .lab-group-required {
+            background: #0e2f56;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body class="stage2-page">
+    <div class="page-shell">
+
+        <!-- HEADER -->
+        <header class="app-header">
+            <a class="brand-mark" href="index.html" aria-label="DiaBeta home">
+                <img src="diabeta-logo.png" alt="DiaBeta logo">
+                <span>DiaBeta</span>
+            </a>
+
+            <!-- MOBILE MENU TOGGLE -->
+            <button class="nav-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" data-drawer-toggle>
+                <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <rect x="3" y="3" width="7" height="7" rx="2" />
+                    <rect x="14" y="3" width="7" height="7" rx="2" />
+                    <rect x="3" y="14" width="7" height="7" rx="2" />
+                    <rect x="14" y="14" width="7" height="7" rx="2" />
+                </svg>
+            </button>
+
+            <!-- DESKTOP NAVIGATION -->
+            <nav class="top-nav" aria-label="Main navigation">
+                <a href="stage1.html">Stage 1 Screener</a>
+                <a href="stage2.html" class="active" style="font-weight: 700; color: #0e2f56;">Stage 2 Risk</a>
+                <a href="stage3.html">Stage 3 Time-Based</a>
+                <a href="records.html">Records</a>
+                <a href="about.html">About</a>
+                <a href="about_me.html">About Me</a>
+                <span class="assessment-pill">Hybrid Assessment</span>
+            </nav>
+        </header>
+
+        <!-- MOBILE DRAWER -->
+        <div class="drawer-overlay" aria-hidden="true"></div>
+        <aside class="side-drawer" aria-hidden="true">
+            <button class="drawer-close" type="button" aria-label="Close navigation menu" data-drawer-close>&times;</button>
+            <nav class="drawer-nav" aria-label="Mobile navigation">
+                <a href="stage1.html">Stage 1 Screener</a>
+                <a href="stage2.html">Stage 2 Risk</a>
+                <a href="stage3.html">Stage 3 Time-Based</a>
+                <a href="records.html">Records</a>
+                <a href="about.html">About</a>
+                <a href="about_me.html">About Me</a>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT CONTAINER -->
+        <main class="stage2-container">
+
+            <!-- STAGE 2 HERO / HEADER -->
+            <header class="section-heading" style="margin-bottom: 28px;">
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 18px;">
+                    <div>
+                        <span class="stage2-badge">Stage 2 — Risk Assessment</span>
+                        <h1 style="font-family: 'Playfair Display', Georgia, serif; font-size: 36px; color: #0e2f56; margin: 0 0 8px 0;">
+                            Detailed Risk Assessment
+                        </h1>
+                        <p style="color: #607084; font-size: 16px; margin: 0; max-width: 720px;">
+                            A comprehensive, higher-level assessment combining patient information, clinical history, and laboratory values (HbA1c and fasting glucose) to determine current diabetes risk: Low, Moderate, or High. Continue from the Stage 1 screener to carry your answers forward automatically, or start right here — Stage 1 is optional.
+                        </p>
+                        <p style="color: #607084; font-size: 14px; margin: 8px 0 0 0; max-width: 720px;">
+                            Your current assessment is kept while you move between stages. Use <strong>Start New Assessment</strong> to clear it and begin fresh.
+                        </p>
+                    </div>
+                    <button
+                        class="secondary-action"
+                        type="button"
+                        id="headerNewAssessmentBtn"
+                        style="flex-shrink: 0; margin-top: 4px;"
+                    >
+                        Start New Assessment
+                    </button>
+                </div>
+            </header>
+
+            <!-- STAGE 1 IMPORT BANNER (Displayed when Stage 1 data exists) -->
+            <div id="stage1ImportCard" class="stage1-import-card" style="display: none;">
+                <div class="stage1-import-info">
+                    <p>Stage 1 Patient Information Detected</p>
+                    <div class="stage1-import-values" id="stage1ImportValues">
+                        Your Stage 1 screening information has been carried forward automatically.
+                    </div>
+                </div>
+                <button type="button" id="toggleDirectModeBtn" class="stage1-import-toggle">
+                    Edit values
+                </button>
+            </div>
+
+            <!-- FORM CARD -->
+            <section class="assessment-layout" style="display: block;">
+                <form class="assessment-form" id="stage2Form" style="max-width: 100%;">
+
+                    <!-- PERSONAL INFORMATION (user identity only - never sent to
+                         the prediction model as features) -->
+                    <div class="form-grid">
+
+                        <!-- PATIENT NAME -->
+                        <label class="field">
+                            <span>Patient Name</span>
+                            <input
+                                type="text"
+                                name="patient_name"
+                                id="stage2PatientName"
+                                placeholder="Full name"
+                                required
+                            >
+                        </label>
+
+                        <!-- PATIENT ADDRESS -->
+                        <label class="field">
+                            <span>Patient Address</span>
+                            <input
+                                type="text"
+                                name="patient_address"
+                                id="stage2PatientAddress"
+                                placeholder="Home address"
+                                required
+                            >
+                        </label>
+
+                    </div>
+
+                    <!-- ASSESSMENT INFORMATION -->
+                    <div class="form-grid">
+
+                        <!-- AGE -->
+                        <label class="field" id="ageField">
+                            <span>
+                                Age
+                                <span class="prefilled-badge" id="ageBadge" style="display:none;">From Stage 1</span>
+                            </span>
+                            <input
+                                type="number"
+                                name="age"
+                                id="stage2Age"
+                                min="1"
+                                max="120"
+                                placeholder="45"
+                                required
+                            >
+                        </label>
+
+                        <!-- SEX -->
+                        <label class="field" id="sexField">
+                            <span>
+                                Sex
+                                <span class="prefilled-badge" id="sexBadge" style="display:none;">From Stage 1</span>
+                            </span>
+                            <select name="sex" id="stage2Sex" required>
+                                <option value="" disabled selected>Select sex</option>
+                                <option value="1">Male</option>
+                                <option value="2">Female</option>
+                            </select>
+                        </label>
+
+                        <!-- BMI -->
+                        <label class="field" id="bmiField">
+                            <span>
+                                BMI <small>(kg/m²)</small>
+                                <span class="prefilled-badge" id="bmiBadge" style="display:none;">From Stage 1</span>
+                            </span>
+                            <input
+                                type="number"
+                                step="0.1"
+                                name="bmi"
+                                id="stage2Bmi"
+                                min="1"
+                                placeholder="27.5"
+                                required
+                            >
+                        </label>
+
+                        <!-- RACE / ETHNICITY -->
+                        <label class="field field-wide" id="raceField">
+                            <span>
+                                Race/Ethnicity
+                                <span class="prefilled-badge" id="raceBadge" style="display:none;">From Stage 1</span>
+                            </span>
+                            <!-- Options are listed statically (same codes/labels as
+                                 /api/race-map) so the dropdown always works immediately,
+                                 even before/without the backend race-map request. -->
+                            <select name="race_ethnicity" id="stage2Race" required>
+                                <option value="" disabled selected>Select race or ethnicity</option>
+                                <option value="1">Mexican American</option>
+                                <option value="2">Other Hispanic</option>
+                                <option value="3">Non-Hispanic White</option>
+                                <option value="4">Non-Hispanic Black</option>
+                                <option value="6">Non-Hispanic Asian</option>
+                                <option value="7">Other / Multi-racial</option>
+                            </select>
+                        </label>
+
+                        <!-- FAMILY HISTORY -->
+                        <label class="field field-wide" id="familyField">
+                            <span>
+                                Family History of Diabetes
+                                <span class="prefilled-badge" id="familyBadge" style="display:none;">From Stage 1</span>
+                            </span>
+                            <select name="family_history" id="stage2Family" required>
+                                <option value="" disabled selected>Select family history</option>
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </label>
+
+                        <!-- HYPERTENSION -->
+                        <label class="field field-wide" id="hypertensionField">
+                            <span>
+                                Hypertension
+                                <span class="prefilled-badge" id="hypertensionBadge" style="display:none;">From Stage 1</span>
+                            </span>
+                            <select name="hypertension" id="stage2Hypertension" required>
+                                <option value="" disabled selected>Select hypertension status</option>
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </label>
+
+                        <!-- PHYSICAL ACTIVITY -->
+                        <label class="field field-wide" id="paField">
+                            <span>
+                                Physical Activity
+                                <span class="prefilled-badge" id="paBadge" style="display:none;">From Stage 1</span>
+                            </span>
+                            <select name="physical_activity" id="stage2PA" required>
+                                <option value="" disabled selected>Select physical activity level</option>
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </label>
+
+                        <!-- SMOKING STATUS -->
+                        <label class="field field-wide" id="smokingField">
+                            <span>
+                                Smoking Status
+                                <span class="prefilled-badge" id="smokingBadge" style="display:none;">From Stage 1</span>
+                            </span>
+                            <select name="smoking_status" id="stage2Smoking" required>
+                                <option value="" disabled selected>Select smoking status</option>
+                                <option value="0">Never</option>
+                                <option value="1">Former</option>
+                                <option value="2">Current</option>
+                            </select>
+                        </label>
+
+                    </div>
+
+                    <!-- LABORATORY VALUES (one grouped container) -->
+                    <div class="lab-values-group">
+                        <div class="lab-group-head">
+                            <span class="lab-group-title">Laboratory Values</span>
+                            <span class="lab-group-required">At least one required</span>
+                        </div>
+
+                        <div class="form-grid">
+
+                            <!-- HBA1C -->
+                            <label class="field">
+                                <span>
+                                    HbA1c <small>(%)</small>
+                                </span>
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    name="hba1c"
+                                    id="stage2Hba1c"
+                                    min="1"
+                                    placeholder="5.6"
+                                >
+                            </label>
+
+                            <!-- FASTING GLUCOSE -->
+                            <label class="field">
+                                <span>
+                                    Fasting Glucose <small>(mg/dL)</small>
+                                </span>
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    name="fasting_glucose"
+                                    id="stage2Glucose"
+                                    min="1"
+                                    placeholder="96"
+                                >
+                            </label>
+
+                        </div>
+                    </div>
+
+                    <!-- SUBMIT BUTTON -->
+                    <button class="primary-action" type="submit" id="submitStage2Btn" style="margin-top: 24px;">
+                        Run Risk Assessment
+                    </button>
+
+                    <p id="stage2FormError" style="color: #d64554; margin-top: 12px; display: none; font-weight: 600;"></p>
+                </form>
+            </section>
+
+            <!-- STAGE 2 RESULT SECTION (Hidden until submission) -->
+            <section class="stage2-result-card" id="stage2ResultCard" style="display: none;">
+                <div class="tier-hero">
+                    <div>
+                        <span class="stage2-badge">Hybrid Assessment Output</span>
+                        <div>
+                            <span class="tier-badge" id="tierBadge">–</span>
+                        </div>
+                        <h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 28px; color: #0e2f56; margin: 8px 0 0 0;" id="tierTitle">
+                            Risk Assessment Result
+                        </h2>
+                    </div>
+
+                    <div style="text-align: right;">
+                        <div class="stage2-score-number" id="riskPctNumber">–%</div>
+                        <div style="font-size: 13px; color: #607084; font-weight: 600;">ML Risk Probability of High risk</div>
+                    </div>
+                </div>
+
+                <!-- WHY THIS RESULT -->
+                <div class="section-heading" style="margin-top: 24px;">
+                    <h3 style="font-size: 18px; color: #0e2f56; margin-bottom: 8px;">Why this result</h3>
+                </div>
+                <ul class="reason-list" id="stage2ReasonList" style="margin-top: 12px;"></ul>
+
+                <!-- EVALUATED PROFILE -->
+                <div class="section-heading" style="margin-top: 24px;">
+                    <h3 style="font-size: 18px; color: #0e2f56; margin-bottom: 8px;">Evaluated Profile</h3>
+                </div>
+
+                <dl class="input-list" id="stage2FactorsList" style="margin-top: 12px;"></dl>
+
+                <!-- ACTIONS -->
+                <div class="stage2-actions">
+                    <a href="stage3.html" class="primary-action" id="continueToStage3Btn" style="text-decoration: none; padding: 12px 24px; font-weight: 700; font-size: 14px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px;">
+                        Continue to Time-Based Risk &rarr;
+                    </a>
+                    <div id="stage3NotApplicableNotice" style="display: none; width: 100%; box-sizing: border-box; background: #fdf0ef; border: 1px solid #d64554; border-left: 4px solid #d64554; color: #8f2b23; padding: 12px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; line-height: 1.5;">
+                        High-risk Stage 2 result detected. Time-based diabetes development risk is not applicable. Please seek appropriate clinical evaluation. You can still use Start New Assessment to begin a fresh assessment.
+                    </div>
+                    <button type="button" class="secondary-action" id="newStage2Btn">
+                        Start New Assessment
+                    </button>
+                    <a href="stage1.html" class="secondary-action" style="text-decoration: none;">
+                        Back to Stage 1 Screener
+                    </a>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- SCRIPT -->
+    <script>
+        const BACKEND_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:")
+            ? "http://127.0.0.1:5000"
+            : "https://diabeta-2.onrender.com";
+
+        (function () {
+            // 1. Drawer logic
+            const toggle = document.querySelector('[data-drawer-toggle]');
+            const drawer = document.querySelector('.side-drawer');
+            const overlay = document.querySelector('.drawer-overlay');
+            const closeBtn = document.querySelector('[data-drawer-close]');
+
+            if (toggle && drawer && overlay) {
+                const openDrawer = () => {
+                    drawer.classList.add('open');
+                    overlay.classList.add('open');
+                    drawer.setAttribute('aria-hidden', 'false');
+                };
+                const closeDrawer = () => {
+                    drawer.classList.remove('open');
+                    overlay.classList.remove('open');
+                    drawer.setAttribute('aria-hidden', 'true');
+                };
+                toggle.addEventListener('click', openDrawer);
+                closeBtn?.addEventListener('click', closeDrawer);
+                overlay.addEventListener('click', closeDrawer);
+            }
+
+            // 2. Load the race/ethnicity map and populate the select
+            let raceMap = {};
+            const raceSelect = document.getElementById('stage2Race');
+
+            async function loadRaceMap() {
+                try {
+                    const response = await fetch(`${BACKEND_URL}/api/race-map`, { cache: "no-store" });
+                    if (!response.ok) throw new Error('Failed to load race map');
+                    raceMap = await response.json();
+                    // Keep any ethnicity the user already picked when refreshing.
+                    const previouslySelected = raceSelect.value;
+                    raceSelect.innerHTML = '<option value="" disabled selected>Select race or ethnicity</option>';
+                    Object.entries(raceMap).forEach(([code, label]) => {
+                        const opt = document.createElement('option');
+                        opt.value = code;
+                        opt.textContent = label;
+                        raceSelect.appendChild(opt);
+                    });
+                    if (previouslySelected && previouslySelected !== '') {
+                        raceSelect.value = previouslySelected;
+                    }
+                } catch (_) {
+                    /* Keep the static options already present in the markup so the
+                       dropdown still works when the race-map request fails. */
+                }
+            }
+
+            // 3. Stage 1 -> Stage 2 data transfer
+            const params = new URLSearchParams(window.location.search);
+            const isFromStage1 = params.get('from') === 'stage1';
+
+            const nameInput = document.getElementById('stage2PatientName');
+            const addressInput = document.getElementById('stage2PatientAddress');
+            const ageInput = document.getElementById('stage2Age');
+            const sexSelect = document.getElementById('stage2Sex');
+            const bmiInput = document.getElementById('stage2Bmi');
+            const familySelect = document.getElementById('stage2Family');
+            const hypSelect = document.getElementById('stage2Hypertension');
+            const paSelect = document.getElementById('stage2PA');
+            const smokingSelect = document.getElementById('stage2Smoking');
+            const hba1cInput = document.getElementById('stage2Hba1c');
+            const glucoseInput = document.getElementById('stage2Glucose');
+
+            const importCard = document.getElementById('stage1ImportCard');
+            const importValuesText = document.getElementById('stage1ImportValues');
+            const toggleDirectBtn = document.getElementById('toggleDirectModeBtn');
+
+            const badges = {
+                age: document.getElementById('ageBadge'),
+                sex: document.getElementById('sexBadge'),
+                bmi: document.getElementById('bmiBadge'),
+                race: document.getElementById('raceBadge'),
+                family: document.getElementById('familyBadge'),
+                hypertension: document.getElementById('hypertensionBadge'),
+                pa: document.getElementById('paBadge'),
+                smoking: document.getElementById('smokingBadge')
+            };
+
+            let importedPerson = null;
+
+            const FORM_STATE_KEY = 'diabeta_current_assessment';
+            const fieldRefs = {
+                patient_name: nameInput,
+                patient_address: addressInput,
+                age: ageInput,
+                sex: sexSelect,
+                race_ethnicity: raceSelect,
+                bmi: bmiInput,
+                family_history: familySelect,
+                hypertension: hypSelect,
+                physical_activity: paSelect,
+                smoking_status: smokingSelect,
+                hba1c: hba1cInput,
+                fasting_glucose: glucoseInput
+            };
+
+            function labelToRaceCode(label) {
+                if (!label) return null;
+                const entry = Object.entries(raceMap).find(([, l]) => l === label);
+                return entry ? entry[0] : null;
+            }
+
+            function parseLab(value, unit) {
+                if (!value || value === 'Not provided') return '';
+                return String(value).replace(unit, '').trim();
+            }
+
+            function saveCurrentDraft() {
+                try {
+                    const draft = {};
+                    Object.keys(fieldRefs).forEach((f) => {
+                        draft[f] = fieldRefs[f] ? fieldRefs[f].value : '';
+                    });
+                    localStorage.setItem(FORM_STATE_KEY, JSON.stringify(draft));
+                } catch (_) {}
+            }
+
+            const TIER_META = {
+                'Low': { css: 'tier-low', title: 'Low Risk' },
+                'Moderate': { css: 'tier-moderate', title: 'Moderate Risk' },
+                'High': { css: 'tier-high', title: 'High Risk' }
+            };
+
+            const form = document.getElementById('stage2Form');
+            const submitBtn = document.getElementById('submitStage2Btn');
+            const formError = document.getElementById('stage2FormError');
+            const resultCard = document.getElementById('stage2ResultCard');
+            const tierBadge = document.getElementById('tierBadge');
+            const tierTitle = document.getElementById('tierTitle');
+            const riskNumber = document.getElementById('riskPctNumber');
+            const reasonList = document.getElementById('stage2ReasonList');
+            const factorsList = document.getElementById('stage2FactorsList');
+            const newAssessmentBtn = document.getElementById('newStage2Btn');
+            const headerNewAssessmentBtn = document.getElementById('headerNewAssessmentBtn');
+
+            function renderStage2Result(resData, person) {
+                const tier = resData.final_risk_level || resData.tier || '—';
+                const meta = TIER_META[tier] || { css: '', title: tier };
+
+                tierBadge.className = 'tier-badge ' + meta.css;
+                tierBadge.textContent = tier;
+                tierTitle.textContent = meta.title;
+                riskNumber.textContent = (resData.prob_high !== undefined && resData.prob_high !== null)
+                    ? Number(resData.prob_high).toFixed(1) + '%'
+                    : '–';
+
+                reasonList.innerHTML = '';
+                const reasons = resData.reason || [];
+                if (reasons.length === 0) {
+                    const li = document.createElement('li');
+                    li.textContent = 'Assessment completed using the hybrid clinical rules.';
+                    reasonList.appendChild(li);
+                } else {
+                    reasons.forEach((r) => {
+                        const li = document.createElement('li');
+                        li.textContent = r;
+                        reasonList.appendChild(li);
+                    });
+                }
+
+                factorsList.innerHTML = '';
+                const p = person || resData.person || {};
+                const hba1cDisplay = (resData.hba1c !== null && resData.hba1c !== undefined)
+                    ? resData.hba1c + '%'
+                    : (p.HbA1c || 'Not provided');
+                const glucoseDisplay = (resData.fasting_glucose !== null && resData.fasting_glucose !== undefined)
+                    ? resData.fasting_glucose + ' mg/dL'
+                    : (p['Fasting Glucose'] || 'Not provided');
+
+                const displayMap = {
+                    'Patient Name': p['Patient Name'],
+                    'Patient Address': p['Patient Address'],
+                    'Age': p.Age,
+                    'Sex': p.Sex,
+                    'BMI': p.BMI,
+                    'Race/Ethnicity': p['Race/Ethnicity'],
+                    'Family History': p['Family History'],
+                    'Hypertension': p.Hypertension !== undefined ? (typeof p.Hypertension === 'string' ? p.Hypertension : (p.Hypertension == 1 ? 'Yes' : 'No')) : 'Not provided',
+                    'Physical Activity': p['Physical Activity'],
+                    'Smoking Status': p['Smoking Status'],
+                    'HbA1c': hba1cDisplay,
+                    'Fasting Glucose': glucoseDisplay
+                };
+                Object.entries(displayMap).forEach(([k, v]) => {
+                    const div = document.createElement('div');
+                    div.innerHTML = `<dt>${k}</dt><dd>${v !== undefined && v !== null && v !== '' ? v : 'Not provided'}</dd>`;
+                    factorsList.appendChild(div);
+                });
+
+                const continueBtn = document.getElementById('continueToStage3Btn');
+                const stage3NaNotice = document.getElementById('stage3NotApplicableNotice');
+                if (resData.stage3_eligible === false || tier === 'High') {
+                    if (continueBtn) continueBtn.style.display = 'none';
+                    if (stage3NaNotice) stage3NaNotice.style.display = 'block';
+                } else {
+                    if (continueBtn) continueBtn.style.display = '';
+                    if (stage3NaNotice) stage3NaNotice.style.display = 'none';
+                }
+
+                resultCard.style.display = 'block';
+            }
+
+            function populateFormFromCurrentAssessment() {
+                let s2Result = null;
+                try {
+                    const raw = localStorage.getItem('diabeta_stage2_hybrid_result');
+                    if (raw) s2Result = JSON.parse(raw);
+                } catch (_) {}
+
+                let lastResult = null;
+                try {
+                    const raw = localStorage.getItem('diabeta_last_result');
+                    if (raw) lastResult = JSON.parse(raw);
+                } catch (_) {}
+
+                let draft = null;
+                try {
+                    const raw = localStorage.getItem(FORM_STATE_KEY);
+                    if (raw) draft = JSON.parse(raw);
+                } catch (_) {}
+
+                // Priority 1: Stage 2 was previously run for this assessment — restore full form AND result card
+                if (s2Result) {
+                    const p = s2Result.person || s2Result;
+                    const raw = s2Result.raw_inputs || draft || {};
+
+                    if (p['Patient Name'] && p['Patient Name'] !== 'Not provided') nameInput.value = p['Patient Name'];
+                    else if (raw.patient_name) nameInput.value = raw.patient_name;
+
+                    if (p['Patient Address'] && p['Patient Address'] !== 'Not provided') addressInput.value = p['Patient Address'];
+                    else if (raw.patient_address) addressInput.value = raw.patient_address;
+
+                    if (p.Age) ageInput.value = p.Age;
+                    else if (raw.age) ageInput.value = raw.age;
+
+                    if (raw.sex) sexSelect.value = raw.sex;
+                    else if (p.Sex) {
+                        const sLower = String(p.Sex).toLowerCase();
+                        sexSelect.value = (sLower.includes('male') && !sLower.includes('female')) || sLower === '1' ? '1' : '2';
+                    }
+
+                    if (p.BMI) bmiInput.value = p.BMI;
+                    else if (raw.bmi) bmiInput.value = raw.bmi;
+
+                    const raceCode = raw.race_ethnicity || labelToRaceCode(p['Race/Ethnicity']);
+                    loadRaceMap().then(() => {
+                        if (raceCode) raceSelect.value = raceCode;
+                    });
+
+                    if (raw.family_history !== undefined && raw.family_history !== '') familySelect.value = raw.family_history;
+                    else if (p['Family History']) familySelect.value = String(p['Family History']).toLowerCase() === 'yes' ? '1' : '0';
+
+                    if (raw.hypertension !== undefined && raw.hypertension !== '') hypSelect.value = raw.hypertension;
+                    else if (p.Hypertension !== undefined) hypSelect.value = (p.Hypertension == 1 || String(p.Hypertension).toLowerCase() === 'yes') ? '1' : '0';
+
+                    if (raw.physical_activity !== undefined && raw.physical_activity !== '') paSelect.value = raw.physical_activity;
+                    else if (p['Physical Activity']) paSelect.value = String(p['Physical Activity']).toLowerCase() === 'active' ? '1' : '0';
+
+                    if (raw.smoking_status !== undefined && raw.smoking_status !== '') smokingSelect.value = raw.smoking_status;
+                    else if (p['Smoking Status']) {
+                        const smk = String(p['Smoking Status']).toLowerCase();
+                        smokingSelect.value = smk === 'current' ? '2' : (smk === 'former' ? '1' : '0');
+                    }
+
+                    if (s2Result.hba1c !== null && s2Result.hba1c !== undefined) hba1cInput.value = s2Result.hba1c;
+                    else if (raw.hba1c) hba1cInput.value = raw.hba1c;
+                    else if (p.HbA1c) hba1cInput.value = parseLab(p.HbA1c, '%');
+
+                    if (s2Result.fasting_glucose !== null && s2Result.fasting_glucose !== undefined) glucoseInput.value = s2Result.fasting_glucose;
+                    else if (raw.fasting_glucose) glucoseInput.value = raw.fasting_glucose;
+                    else if (p['Fasting Glucose']) glucoseInput.value = parseLab(p['Fasting Glucose'], 'mg/dL');
+
+                    renderStage2Result(s2Result, p);
+
+                    if (lastResult && lastResult.person && !lastResult.fromDirectStage2) {
+                        importCard.style.display = 'flex';
+                        importValuesText.textContent = `Carried forward from Stage 1: Patient Name (${p['Patient Name'] || 'Not provided'}), Patient Address (${p['Patient Address'] || 'Not provided'}), Age (${p.Age || '–'}), Sex (${p.Sex || '–'}), BMI (${p.BMI || '–'}), Race/Ethnicity (${p['Race/Ethnicity'] || '–'}), Family History (${p['Family History'] || '–'}), Hypertension (${p.Hypertension || '–'}), Physical Activity (${p['Physical Activity'] || '–'}), Smoking Status (${p['Smoking Status'] || '–'}).`;
+                    } else {
+                        importCard.style.display = 'none';
+                    }
+                    return;
+                }
+
+                // Priority 2: Carried from Stage 1 screener (Stage 2 not run yet)
+                const stage1Person = (lastResult && lastResult.person && !lastResult.fromDirectStage2) ? lastResult.person : null;
+                if (stage1Person) {
+                    importedPerson = stage1Person;
+                    const p = stage1Person;
+                    const raw = draft || {};
+
+                    if (p['Patient Name'] && p['Patient Name'] !== 'Not provided') nameInput.value = p['Patient Name'];
+                    else if (raw.patient_name) nameInput.value = raw.patient_name;
+
+                    if (p['Patient Address'] && p['Patient Address'] !== 'Not provided') addressInput.value = p['Patient Address'];
+                    else if (raw.patient_address) addressInput.value = raw.patient_address;
+
+                    if (p.Age) ageInput.value = p.Age;
+                    else if (raw.age) ageInput.value = raw.age;
+
+                    if (raw.sex) sexSelect.value = raw.sex;
+                    else if (p.Sex) {
+                        const sLower = String(p.Sex).toLowerCase();
+                        sexSelect.value = (sLower.includes('male') && !sLower.includes('female')) || sLower === '1' ? '1' : '2';
+                    }
+
+                    if (p.BMI) bmiInput.value = p.BMI;
+                    else if (raw.bmi) bmiInput.value = raw.bmi;
+
+                    const raceCode = raw.race_ethnicity || labelToRaceCode(p['Race/Ethnicity']);
+                    loadRaceMap().then(() => {
+                        if (raceCode) raceSelect.value = raceCode;
+                    });
+
+                    if (raw.family_history !== undefined && raw.family_history !== '') familySelect.value = raw.family_history;
+                    else if (p['Family History']) familySelect.value = String(p['Family History']).toLowerCase() === 'yes' ? '1' : '0';
+
+                    if (raw.hypertension !== undefined && raw.hypertension !== '') hypSelect.value = raw.hypertension;
+                    else if (p.Hypertension !== undefined) hypSelect.value = (p.Hypertension == 1 || String(p.Hypertension).toLowerCase() === 'yes') ? '1' : '0';
+
+                    if (raw.physical_activity !== undefined && raw.physical_activity !== '') paSelect.value = raw.physical_activity;
+                    else if (p['Physical Activity']) paSelect.value = String(p['Physical Activity']).toLowerCase() === 'active' ? '1' : '0';
+
+                    if (raw.smoking_status !== undefined && raw.smoking_status !== '') smokingSelect.value = raw.smoking_status;
+                    else if (p['Smoking Status']) {
+                        const smk = String(p['Smoking Status']).toLowerCase();
+                        smokingSelect.value = smk === 'current' ? '2' : (smk === 'former' ? '1' : '0');
+                    }
+
+                    if (raw.hba1c) hba1cInput.value = raw.hba1c;
+                    if (raw.fasting_glucose) glucoseInput.value = raw.fasting_glucose;
+
+                    importCard.style.display = 'flex';
+                    importValuesText.textContent = `Carried forward: Patient Name (${p['Patient Name'] || 'Not provided'}), Patient Address (${p['Patient Address'] || 'Not provided'}), Age (${p.Age || '–'}), Sex (${p.Sex || '–'}), BMI (${p.BMI || '–'}), Race/Ethnicity (${p['Race/Ethnicity'] || '–'}), Family History (${p['Family History'] || '–'}), Hypertension (${p.Hypertension || '–'}), Physical Activity (${p['Physical Activity'] || '–'}), Smoking Status (${p['Smoking Status'] || '–'}).`;
+
+                    if (isFromStage1) {
+                        Object.values(badges).forEach(b => { if (b) b.style.display = 'inline'; });
+                    }
+
+                    if (!toggleDirectBtn.dataset.bound) {
+                        toggleDirectBtn.dataset.bound = '1';
+                        toggleDirectBtn.addEventListener('click', () => {
+                            importCard.style.display = 'none';
+                            Object.values(badges).forEach(b => { if (b) b.style.display = 'none'; });
+                            ageInput.focus();
+                        });
+                    }
+
+                    resultCard.style.display = 'none';
+                    return;
+                }
+
+                // Priority 3: Direct Stage 2 with existing in-progress draft
+                if (draft && Object.keys(draft).length > 0) {
+                    if (draft.patient_name) nameInput.value = draft.patient_name;
+                    if (draft.patient_address) addressInput.value = draft.patient_address;
+                    if (draft.age) ageInput.value = draft.age;
+                    if (draft.sex) sexSelect.value = draft.sex;
+                    if (draft.bmi) bmiInput.value = draft.bmi;
+                    loadRaceMap().then(() => {
+                        if (draft.race_ethnicity) raceSelect.value = draft.race_ethnicity;
+                    });
+                    if (draft.family_history !== undefined) familySelect.value = draft.family_history;
+                    if (draft.hypertension !== undefined) hypSelect.value = draft.hypertension;
+                    if (draft.physical_activity !== undefined) paSelect.value = draft.physical_activity;
+                    if (draft.smoking_status !== undefined) smokingSelect.value = draft.smoking_status;
+                    if (draft.hba1c) hba1cInput.value = draft.hba1c;
+                    if (draft.fasting_glucose) glucoseInput.value = draft.fasting_glucose;
+
+                    importCard.style.display = 'none';
+                    resultCard.style.display = 'none';
+                    return;
+                }
+
+                // Priority 4: Fresh Direct Stage 2
+                loadRaceMap();
+                importCard.style.display = 'none';
+                resultCard.style.display = 'none';
+            }
+
+            populateFormFromCurrentAssessment();
+
+            window.addEventListener('pageshow', () => {
+                populateFormFromCurrentAssessment();
+            });
+
+            // Mirror every edit so the current assessment survives navigation
+            form.addEventListener('input', saveCurrentDraft);
+            form.addEventListener('change', saveCurrentDraft);
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                formError.style.display = 'none';
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Running Assessment…';
+
+                const formData = new FormData(e.target);
+                const hba1cRaw = formData.get('hba1c');
+                const glucoseRaw = formData.get('fasting_glucose');
+
+                // At least one laboratory value (HbA1c or fasting glucose) is required
+                const hba1cEntered = hba1cRaw && hba1cRaw.trim() !== '';
+                const glucoseEntered = glucoseRaw && glucoseRaw.trim() !== '';
+                if (!hba1cEntered && !glucoseEntered) {
+                    formError.textContent = 'Provide at least one laboratory value to continue.';
+                    formError.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Run Risk Assessment';
+                    return;
+                }
+
+                const payload = {
+                    patient_name: formData.get('patient_name'),
+                    patient_address: formData.get('patient_address'),
+                    age: formData.get('age'),
+                    sex: formData.get('sex'),
+                    bmi: formData.get('bmi'),
+                    race_ethnicity: formData.get('race_ethnicity'),
+                    family_history: formData.get('family_history'),
+                    hypertension: formData.get('hypertension'),
+                    physical_activity: formData.get('physical_activity'),
+                    smoking_status: formData.get('smoking_status'),
+                    hba1c: hba1cRaw && hba1cRaw.trim() !== '' ? hba1cRaw.trim() : null,
+                    fasting_glucose: glucoseRaw && glucoseRaw.trim() !== '' ? glucoseRaw.trim() : null
+                };
+
+                try {
+                    const response = await fetch(`${BACKEND_URL}/api/predict-stage2`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const err = await response.json().catch(() => ({}));
+                        throw new Error(err.error || 'Risk assessment failed.');
+                    }
+
+                    const resData = await response.json();
+                    const tier = resData.final_risk_level || resData.tier || '—';
+                    const person = resData.person || {};
+                    const reasons = resData.reason || [];
+                    const hypertensionActual = String(person.Hypertension || '').toLowerCase() === 'yes' ? 1 : 0;
+                    const hba1cStored = hba1cEntered ? Number(hba1cRaw) : null;
+                    const glucoseStored = glucoseEntered ? Number(glucoseRaw) : null;
+                    const ruleTriggered = resData.rule_triggered || null;
+                    const stage3Eligible = resData.stage3_eligible !== false && tier !== 'High';
+
+                    const s2Record = {
+                        'Patient Name': person['Patient Name'] || payload.patient_name || '',
+                        'Patient Address': person['Patient Address'] || payload.patient_address || '',
+                        Age: person.Age || payload.age,
+                        Sex: person.Sex,
+                        sex_raw: payload.sex,
+                        BMI: person.BMI || payload.bmi,
+                        'Race/Ethnicity': person['Race/Ethnicity'],
+                        race_raw: payload.race_ethnicity,
+                        'Family History': person['Family History'],
+                        family_raw: payload.family_history,
+                        Hypertension: hypertensionActual,
+                        'Hypertension_Label': person.Hypertension,
+                        hypertension_raw: payload.hypertension,
+                        'Physical Activity': person['Physical Activity'],
+                        pa_raw: payload.physical_activity,
+                        'Smoking Status': person['Smoking Status'],
+                        smoking_raw: payload.smoking_status,
+                        High_Cholesterol: 0,
+                        Heart_Disease: 0,
+                        Stroke: 0,
+                        hba1c: hba1cStored,
+                        fasting_glucose: glucoseStored,
+                        tier: tier,
+                        final_risk_level: tier,
+                        prob_high: resData.prob_high,
+                        reason: reasons,
+                        rule_triggered: ruleTriggered,
+                        stage3_eligible: stage3Eligible,
+                        person: person,
+                        raw_inputs: payload
+                    };
+
+                    try {
+                        localStorage.setItem('diabeta_stage2_hybrid_result', JSON.stringify(s2Record));
+                        localStorage.setItem(FORM_STATE_KEY, JSON.stringify(payload));
+                    } catch (_) {}
+
+                    // Ensure the current assessment identity and demographics carry over
+                    // to Stage 1 and Stage 3 even if starting directly at Stage 2
+                    try {
+                        let last = null;
+                        const rawLast = localStorage.getItem('diabeta_last_result');
+                        if (rawLast) {
+                            last = JSON.parse(rawLast);
+                        }
+                        if (!last) {
+                            last = {
+                                id: Date.now().toString(),
+                                createdAt: new Date().toISOString(),
+                                fromDirectStage2: true,
+                                person: person
+                            };
+                        } else {
+                            last.person = { ...(last.person || {}), ...person };
+                        }
+                        localStorage.setItem('diabeta_last_result', JSON.stringify(last));
+                    } catch (_) {}
+
+                    renderStage2Result(resData, person);
+                    resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                } catch (err) {
+                    formError.textContent = err.message || 'Something went wrong.';
+                    formError.style.display = 'block';
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Run Risk Assessment';
+                }
+            });
+
+            /*
+             * The ONLY reset path from Stage 2: the explicit Start New
+             * Assessment action. It clears the entire current assessment -
+             * personal information, Stage 1 result, Stage 2 result and
+             * laboratory values, and Stage 3 state - then begins fresh.
+             * Saved historical records (diabetaRecords) are never touched.
+             * Ordinary navigation never runs this.
+             */
+            function handleStartNewAssessment() {
+                if (!window.confirm('Start a new assessment? The current assessment will be cleared.')) {
+                    return;
+                }
+                try {
+                    localStorage.removeItem('diabeta_last_result');
+                    localStorage.removeItem('diabeta_stage2_hybrid_result');
+                    localStorage.removeItem('diabeta_stage3_result');
+                    localStorage.removeItem(FORM_STATE_KEY);
+                    sessionStorage.removeItem('diabeta_stage2_form_state');
+                } catch (_) {}
+
+                form.reset();
+                Object.keys(fieldRefs).forEach(k => {
+                    if (fieldRefs[k]) fieldRefs[k].value = '';
+                });
+                importedPerson = null;
+                resultCard.style.display = 'none';
+                importCard.style.display = 'none';
+                Object.values(badges).forEach(b => { if (b) b.style.display = 'none'; });
+                formError.style.display = 'none';
+                formError.textContent = '';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            headerNewAssessmentBtn?.addEventListener('click', handleStartNewAssessment);
+            newAssessmentBtn?.addEventListener('click', handleStartNewAssessment);
+
+        })();
+    </script>
+</body>
+</html>

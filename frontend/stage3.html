@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage 3: Time-Based Diabetes Risk — DiaBeta V2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Playfair+Display:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .stage3-container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 24px 20px 60px;
+        }
+        .stage3-badge {
+            display: inline-block;
+            background: #0e2f56;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+        }
+        .imported-data-card {
+            background: #f0f7fd;
+            border: 1px solid #c9e0f5;
+            border-left: 6px solid #1767b3;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
+        }
+        .imported-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .imported-header h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #0e2f56;
+            font-weight: 700;
+        }
+        .imported-pill {
+            background: #dceaf7;
+            color: #0e2f56;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 3px 10px;
+            border-radius: 12px;
+        }
+        .imported-factors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #4a5c6e;
+        }
+        .imported-factors-grid div strong {
+            color: #0e2f56;
+        }
+        .horizon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+        .horizon-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 22px 20px;
+            box-shadow: 0 4px 15px rgba(14, 47, 86, 0.04);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+        .horizon-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #0e2f56;
+        }
+        .horizon-card.h-1yr::before { background: #1767b3; }
+        .horizon-card.h-2yr::before { background: #0e2f56; }
+
+        .chance-badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 20px;
+            margin-bottom: 0;
+            letter-spacing: 0.02em;
+            line-height: 1.2;
+            width: fit-content;
+        }
+        .chance-lower {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        .chance-average {
+            background: #eef2f6;
+            color: #33475b;
+            border: 1px solid #cbd5e1;
+        }
+        .chance-higher {
+            background: #fff8e1;
+            color: #b78103;
+            border: 1px solid #ffe082;
+        }
+
+        .horizon-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #607084;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
+        }
+        .horizon-value {
+            font-size: 42px;
+            font-weight: 800;
+            color: #0e2f56;
+            font-family: 'Playfair Display', Georgia, serif;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+        .stage3-result-wrapper {
+            background: #ffffff;
+            border: 2px solid #0e2f56;
+            border-radius: 12px;
+            padding: 32px 28px;
+            margin-top: 32px;
+            box-shadow: 0 8px 30px rgba(14, 47, 86, 0.08);
+        }
+        .imported-group {
+            margin-bottom: 18px;
+        }
+        .imported-group:last-child {
+            margin-bottom: 0;
+        }
+        .imported-group h4 {
+            margin: 0 0 8px;
+            font-size: 12px;
+            color: #0e2f56;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .imported-group .imported-factors-grid {
+            margin-bottom: 0;
+        }
+        .projection-plot {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 18px 16px 10px;
+            margin: 12px 0 24px;
+        }
+        .projection-plot svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .projection-plot-caption {
+            font-size: 12px;
+            color: #718096;
+            margin: 10px 0 4px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body class="stage3-page">
+    <div class="page-shell">
+
+        <!-- HEADER -->
+        <header class="app-header">
+            <a class="brand-mark" href="index.html" aria-label="DiaBeta home">
+                <img src="diabeta-logo.png" alt="DiaBeta logo">
+                <span>DiaBeta</span>
+            </a>
+
+            <!-- MOBILE MENU TOGGLE -->
+            <button class="nav-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" data-drawer-toggle>
+                <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <rect x="3" y="3" width="7" height="7" rx="2" />
+                    <rect x="14" y="3" width="7" height="7" rx="2" />
+                    <rect x="3" y="14" width="7" height="7" rx="2" />
+                    <rect x="14" y="14" width="7" height="7" rx="2" />
+                </svg>
+            </button>
+
+            <!-- DESKTOP NAVIGATION -->
+            <nav class="top-nav" aria-label="Main navigation">
+                <a href="stage1.html">Stage 1 Screener</a>
+                <a href="stage2.html">Stage 2 Risk</a>
+                <a href="stage3.html" class="active" style="font-weight: 700; color: #0e2f56;">Stage 3 Time-Based</a>
+                <a href="records.html">Records</a>
+                <a href="about.html">About</a>
+                <a href="about_me.html">About Me</a>
+                <span class="assessment-pill">Stage 3</span>
+            </nav>
+        </header>
+
+        <!-- MOBILE DRAWER -->
+        <div class="drawer-overlay" aria-hidden="true"></div>
+        <aside class="side-drawer" aria-hidden="true">
+            <button class="drawer-close" type="button" aria-label="Close navigation menu" data-drawer-close>&times;</button>
+            <nav class="drawer-nav" aria-label="Mobile navigation">
+                <a href="stage1.html">Stage 1 Screener</a>
+                <a href="stage2.html">Stage 2 Risk</a>
+                <a href="stage3.html">Stage 3 Time-Based</a>
+                <a href="records.html">Records</a>
+                <a href="about.html">About</a>
+                <a href="about_me.html">About Me</a>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTAINER -->
+        <main class="stage3-container">
+
+            <header class="section-heading" style="margin-bottom: 28px;">
+                <span class="stage3-badge">Stage 3 — Time-Based Risk</span>
+                <h1 style="font-family: 'Playfair Display', Georgia, serif; font-size: 36px; color: #0e2f56; margin: 0 0 8px 0;">
+                    Time-Based Diabetes Risk Assessment
+                </h1>
+                <p style="color: #607084; font-size: 16px; margin: 0; max-width: 720px;">
+                    Estimates your future diabetes risk trajectory across 1-year and 2-year horizons.
+                </p>
+            </header>
+
+            <!-- IMPORTED PATIENT DATA CARD (Shows when arriving from Stage 1/2) -->
+            <div id="importedDataCard" class="imported-data-card" style="display: none;">
+                <div class="imported-header">
+                    <h3>Patient Parameters Imported from Previous Stages</h3>
+                    <span class="imported-pill">Connected Flow</span>
+                </div>
+                <div id="importedFactorsGrid"></div>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button type="button" class="primary-action" id="generateProjectionsBtn" style="padding: 10px 22px; font-size: 14px;">
+                        Prediction Over Time
+                    </button>
+                </div>
+                <p id="s3FormError" style="color: #d64554; margin-top: 12px; display: none; font-weight: 600;"></p>
+            </div>
+
+            <!-- HIGH-RISK NOT-APPLICABLE BANNER (Stage 3 eligibility safeguard) -->
+            <div id="stage3NotApplicableBanner" style="display: none; background: #fdf0ef; border: 1px solid #d64554; border-left: 4px solid #d64554; color: #8f2b23; padding: 16px 20px; border-radius: 8px; font-weight: 600; font-size: 15px; line-height: 1.5; margin-bottom: 20px;">
+                High-risk Stage 2 result detected. Time-based diabetes development risk is not applicable. Please seek appropriate clinical evaluation.
+            </div>
+
+            <!-- NO PRIOR ASSESSMENT NOTICE (only shown when Stage 3 is opened
+                 without a completed Stage 1 / Stage 2 assessment) -->
+            <section id="stage3NoDataSection" class="imported-data-card" style="display: none;">
+                <div class="imported-header">
+                    <h3>No Previous Assessment Found</h3>
+                    <span class="imported-pill">Stage 3</span>
+                </div>
+                <p style="color: #4a5c6e; font-size: 14px; line-height: 1.6; margin: 0 0 16px;">
+                    Time-based diabetes projections are generated automatically from a completed
+                    Stage 1 or Stage 2 assessment. Stage 3 does not collect patient data.
+                    Please complete an assessment first. Your current assessment is kept while
+                    you move between stages - nothing is lost by navigating.
+                </p>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <a href="stage1.html" class="primary-action"
+                       style="text-decoration: none; display: inline-block; padding: 12px 24px; font-weight: 700; font-size: 14px; border-radius: 8px;">
+                        Go to Stage 1 Screener
+                    </a>
+                    <a href="stage2.html" class="secondary-action"
+                       style="text-decoration: none; display: inline-block; padding: 12px 24px; font-weight: 700; font-size: 14px; border-radius: 8px;">
+                        Go to Stage 2 Risk
+                    </a>
+                </div>
+            </section>
+
+            <!-- STAGE 3 RESULTS WRAPPER (Hidden initially) -->
+            <section class="stage3-result-wrapper" id="stage3ResultsCard" style="display: none;">
+
+                <div class="section-heading" style="margin-bottom: 8px;">
+                    <h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 26px; color: #0e2f56; margin: 0 0 6px 0;">
+                        Longitudinal Risk Horizons
+                    </h2>
+                    <p style="color: #607084; font-size: 14px; margin: 0;">
+                        Projected transition probability over time without preventive metabolic intervention.
+                    </p>
+                </div>
+
+                <!-- PATIENT-FRIENDLY EXPLANATION -->
+                <div class="patient-explanation" style="font-size: 14px; color: #33475b; line-height: 1.6; background: #f0f7fd; border: 1px solid #c9e0f5; border-left: 4px solid #1767b3; padding: 14px 18px; border-radius: 6px; margin: 18px 0 22px;">
+                    This percentage represents the estimated chance of developing diabetes within the stated time period, based on the information provided and patterns observed in the reference population.
+                </div>
+
+                <!-- 1-YEAR AND 2-YEAR HORIZON CARDS -->
+                <div class="horizon-grid">
+
+                    <!-- 1-YEAR -->
+                    <div class="horizon-card h-1yr">
+                        <div class="horizon-title">1-Year Future Risk</div>
+                        <div class="horizon-value" id="pct1yr">–%</div>
+                        <div id="badge1yr" class="chance-badge chance-average">Around-average chance</div>
+                    </div>
+
+                    <!-- 2-YEAR -->
+                    <div class="horizon-card h-2yr">
+                        <div class="horizon-title">2-Year Future Risk</div>
+                        <div class="horizon-value" id="pct2yr">–%</div>
+                        <div id="badge2yr" class="chance-badge chance-average">Around-average chance</div>
+                    </div>
+
+                </div>
+
+                <!-- PROJECTION PLOT -->
+                <div class="section-heading" style="margin-top: 28px;">
+                    <h3 style="font-size: 17px; color: #0e2f56; margin-bottom: 4px;">Plot of the Projection</h3>
+                </div>
+                <div class="projection-plot">
+                    <svg id="projectionPlotSvg" viewBox="0 0 640 260" role="img" aria-label="Plot of projected diabetes transition risk at 1-year and 2-year horizons" preserveAspectRatio="xMidYMid meet"></svg>
+                    <p class="projection-plot-caption">Points show model estimates at 1-year and 2-year horizons. The dashed line connects the two evaluated horizons as a visual guide; values between these years are not directly measured.</p>
+                </div>
+
+                <!-- CLINICAL CONTEXT -->
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 20px; margin: 24px 0;">
+                    <h4 style="margin: 0 0 6px 0; color: #0e2f56; font-size: 15px;">Clinical Horizon Guidance</h4>
+                    <p style="margin: 0; font-size: 13px; color: #4a5c6e; line-height: 1.5;">
+                        Diabetes risk compounds over time. Structured lifestyle interventions (dietary modification, regular aerobic physical activity, and targeted blood pressure/lipid control) have been clinically shown to reduce future diabetes incidence significantly.
+                    </p>
+                </div>
+
+                <!-- RESEARCH DISCLAIMER -->
+                <div class="stage3-disclaimer" style="background: #fdfefe; border: 1px solid #e2e8f0; border-left: 4px solid #64748b; border-radius: 6px; padding: 14px 18px; margin: 20px 0; font-size: 13px; color: #475569; line-height: 1.5;">
+                    <strong>Disclaimer:</strong> This is an academic/research risk assessment and is not a clinically validated diagnostic device.
+                </div>
+
+                <!-- EVALUATED FACTORS -->
+                <div class="section-heading" style="margin-top: 24px;">
+                    <h3 style="font-size: 17px; color: #0e2f56; margin-bottom: 8px;">Evaluated Profile Factors</h3>
+                </div>
+                <dl class="input-list" id="s3FactorsList" style="margin-top: 12px;"></dl>
+
+                <!-- ACTIONS -->
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px;">
+                    <a href="stage2.html" class="primary-action" style="text-decoration: none; padding: 12px 24px; font-weight: 700; font-size: 14px; border-radius: 8px;">
+                        Back to Stage 2 Risk
+                    </a>
+                    <a href="stage1.html" class="secondary-action" style="text-decoration: none; padding: 12px 20px; font-weight: 700; font-size: 14px; border-radius: 8px;">
+                        Back to Stage 1 Screener
+                    </a>
+                    <button type="button" class="secondary-action" id="recalcBtn" style="padding: 12px 20px; font-size: 14px;">
+                        Recalculate Horizons
+                    </button>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <!-- SCRIPT -->
+    <script>
+        const BACKEND_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:")
+            ? "http://127.0.0.1:5000"
+            : "https://diabeta-2.onrender.com";
+
+        (function () {
+            // 1. Drawer navigation
+            const toggle = document.querySelector('[data-drawer-toggle]');
+            const drawer = document.querySelector('.side-drawer');
+            const overlay = document.querySelector('.drawer-overlay');
+            const closeBtn = document.querySelector('[data-drawer-close]');
+
+            if (toggle && drawer && overlay) {
+                const open = () => { drawer.classList.add('open'); overlay.classList.add('open'); drawer.setAttribute('aria-hidden', 'false'); };
+                const close = () => { drawer.classList.remove('open'); overlay.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true'); };
+                toggle.addEventListener('click', open);
+                closeBtn?.addEventListener('click', close);
+                overlay.addEventListener('click', close);
+            }
+
+            // 2. Data Retrieval from Stage 1 & Stage 2
+            let patientProfile = null;
+            let stage3Blocked = false;
+            let fromStage2 = false;
+
+            try {
+                // Priority: Stage 2 complete profile, fallback to Stage 1
+                const s2Stored = localStorage.getItem('diabeta_stage2_hybrid_result');
+                const s1Stored = localStorage.getItem('diabeta_last_result');
+                let s1Person = null;
+                if (s1Stored) {
+                    const s1Parsed = JSON.parse(s1Stored);
+                    if (s1Parsed && s1Parsed.person) s1Person = s1Parsed.person;
+                }
+
+                if (s2Stored) {
+                    patientProfile = JSON.parse(s2Stored);
+                    fromStage2 = true;
+                    // Stage 3 eligibility safeguard (defense-in-depth): a final
+                    // Stage 2 result of HIGH makes time-based future risk NOT
+                    // applicable - regardless of which rule produced HIGH (Rule 1
+                    // diabetes-range labs, Rule 2 P(High) >= 0.70, or Rule 4
+                    // screener fallback). Only LOW and MODERATE may proceed.
+                    if (patientProfile && patientProfile.stage3_eligible === false) {
+                        stage3Blocked = true;
+                    }
+                } else if (s1Person) {
+                    // Carry the patient's ACTUAL Stage 1 hypertension answer
+                    // into the Stage 3 profile. Stage 1 collects hypertension
+                    // and the backend records it in person.Hypertension
+                    // ("Yes"/"No"). Hard-coding this to 0 sent every Stage
+                    // 1 -> Stage 3 request the same sz101 value, flattening
+                    // different assessments into identical predictions.
+                    const s1Hyp = String(s1Person.Hypertension || "").toLowerCase();
+                    patientProfile = {
+                        Age: s1Person.Age,
+                        Sex: s1Person.Sex,
+                        BMI: s1Person.BMI,
+                        Hypertension: s1Hyp === "yes" ? 1 : 0,
+                        High_Cholesterol: 0,
+                        Heart_Disease: 0,
+                        Stroke: 0
+                    };
+                }
+
+                // Enrich the carried-forward profile with patient-level fields
+                // from the Stage 1 / Stage 2 record (name, address, demographics) so the
+                // Stage 3 summary can display them read-only. Fields that are
+                // not available for the pathway used stay unset and render as
+                // "Not provided" - nothing is invented.
+                if (patientProfile) {
+                    const srcPerson = patientProfile.person || s1Person || {};
+                    if (!patientProfile['Patient Name'] && srcPerson['Patient Name']) patientProfile['Patient Name'] = srcPerson['Patient Name'];
+                    if (!patientProfile['Patient Address'] && srcPerson['Patient Address']) patientProfile['Patient Address'] = srcPerson['Patient Address'];
+                    if (!patientProfile['Race/Ethnicity'] && srcPerson['Race/Ethnicity']) patientProfile['Race/Ethnicity'] = srcPerson['Race/Ethnicity'];
+                    if (!patientProfile['Family History'] && srcPerson['Family History']) patientProfile['Family History'] = srcPerson['Family History'];
+                    if (!patientProfile['Physical Activity'] && srcPerson['Physical Activity']) patientProfile['Physical Activity'] = srcPerson['Physical Activity'];
+                    if (!patientProfile['Smoking Status'] && srcPerson['Smoking Status']) patientProfile['Smoking Status'] = srcPerson['Smoking Status'];
+                }
+            } catch (_) {}
+
+            const importedCard = document.getElementById('importedDataCard');
+            const factorsGrid = document.getElementById('importedFactorsGrid');
+            const noDataSection = document.getElementById('stage3NoDataSection');
+            const genBtn = document.getElementById('generateProjectionsBtn');
+
+            // Stage 3 never collects input: the model inputs are taken straight
+            // from the carried-forward assessment profile (read-only).
+            let carriedInputs = null;
+
+            // 2b. Render carried-forward information as READ-ONLY summary cards.
+            // Patient-level fields come from the Stage 1/Stage 2 records; Stage 2
+            // clinical values (HbA1c, fasting glucose, final classification) are
+            // shown for continuity/context only and are NOT added to the Stage 3
+            // model inputs. Missing values render as "Not provided" - nothing is
+            // ever invented.
+            function displayYesNo(value) {
+                if (value === undefined || value === null || value === '') return 'Not provided';
+                const s = String(value).trim().toLowerCase();
+                if (s === 'yes' || s === 'true') return 'Yes';
+                if (s === 'no' || s === 'false') return 'No';
+                return value == 1 ? 'Yes' : 'No';
+            }
+
+            if (patientProfile && patientProfile.Age) {
+                importedCard.style.display = 'block';
+
+                // Build the model inputs directly from the carried-forward
+                // profile (no form elements involved - all read-only).
+                const sLower = String(patientProfile.Sex || "").toLowerCase();
+                carriedInputs = {
+                    Age: String(patientProfile.Age),
+                    Sex: (sLower.includes('male') && !sLower.includes('female')) || sLower === '1' ? 'Male' : 'Female',
+                    Hypertension: patientProfile.Hypertension == 1 ? '1' : '0',
+                    High_Cholesterol: patientProfile.High_Cholesterol == 1 ? '1' : '0',
+                    Heart_Disease: patientProfile.Heart_Disease == 1 ? '1' : '0',
+                    Stroke: patientProfile.Stroke == 1 ? '1' : '0'
+                };
+
+                // Patient information summary
+                const sRaw = String(patientProfile.Sex || '').toLowerCase();
+                let sexLabel = patientProfile.Sex || 'Not provided';
+                if ((sRaw.includes('male') && !sRaw.includes('female')) || sRaw === '1') sexLabel = 'Male';
+                else if (sRaw.includes('female') || sRaw === '2') sexLabel = 'Female';
+
+                const patientRows = [
+                    ['Patient Name', patientProfile['Patient Name']],
+                    ['Patient Address', patientProfile['Patient Address']],
+                    ['Age', patientProfile.Age],
+                    ['Sex', sexLabel],
+                    ['BMI', patientProfile.BMI],
+                    ['Family History', patientProfile['Family History']],
+                    ['Hypertension', displayYesNo(patientProfile.Hypertension)],
+                    ['Physical Activity', patientProfile['Physical Activity']],
+                    ['Smoking Status', patientProfile['Smoking Status']],
+                    ['Race/Ethnicity', patientProfile['Race/Ethnicity']]
+                ].map(([k, v]) => {
+                    const val = (v !== undefined && v !== null && v !== '') ? v : 'Not provided';
+                    return `<div><strong>${k}:</strong> ${val}</div>`;
+                }).join('');
+
+                // Stage 2 clinical information (continuity/context only)
+                const hba1cVal = (typeof patientProfile.hba1c === 'number' && patientProfile.hba1c !== null) ? patientProfile.hba1c + '%' : 'Not provided';
+                const glucoseVal = (typeof patientProfile.fasting_glucose === 'number' && patientProfile.fasting_glucose !== null) ? patientProfile.fasting_glucose + ' mg/dL' : 'Not provided';
+                const tierVal = patientProfile.tier ? patientProfile.tier : 'Not provided';
+                const clinicalRows = [
+                    ['HbA1c', hba1cVal],
+                    ['Fasting Glucose', glucoseVal],
+                    ['Stage 2 Final Risk Classification', tierVal]
+                ].map(([k, v]) => `<div><strong>${k}:</strong> ${v}</div>`).join('');
+
+                factorsGrid.innerHTML = `
+                    <div class="imported-group">
+                        <h4>Patient Information</h4>
+                        <div class="imported-factors-grid">${patientRows}</div>
+                    </div>
+                    ${fromStage2 ? `
+                    <div class="imported-group">
+                        <h4>Stage 2 Clinical Information</h4>
+                        <div class="imported-factors-grid">${clinicalRows}</div>
+                    </div>` : ''}
+                `;
+
+                // Defensive UI state for a Stage 2 HIGH patient (Rule 1, 2, or 4):
+                // show the not-applicable banner and remove the calculation CTA.
+                if (stage3Blocked) {
+                    const naBanner = document.getElementById('stage3NotApplicableBanner');
+                    if (naBanner) naBanner.style.display = 'block';
+                    if (genBtn) genBtn.style.display = 'none';
+                }
+
+                // Carried-forward information is READ-ONLY: there is no Edit
+                // action, so values from earlier stages cannot be changed here.
+                // The Generate button runs the projection with this profile.
+                genBtn.addEventListener('click', () => {
+                    triggerStage3Calculation({ ...carriedInputs });
+                });
+            } else {
+                // No carried-forward assessment (e.g. Stage 3 opened on its own):
+                // the page never asks for patient data again. Show a notice that
+                // directs the user to start from Stage 1.
+                if (noDataSection) noDataSection.style.display = 'block';
+            }
+
+            // 3. API Request & Display
+            const formError = document.getElementById('s3FormError');
+
+            // Reference-population distribution logic (audited across 6,179 HRS cohort records)
+            // 1-Year: < 2.0% (Lower chance), 2.0% - 3.0% (Around-average chance), > 3.0% (Higher chance)
+            // 2-Year: < 4.0% (Lower chance), 4.0% - 5.8% (Around-average chance), > 5.8% (Higher chance)
+            function getHorizonInterpretation(horizonKey, pct) {
+                const val = Number(pct);
+                if (horizonKey === '1_year') {
+                    if (val < 2.0) return { label: 'Lower chance', className: 'chance-lower' };
+                    if (val <= 3.0) return { label: 'Around-average chance', className: 'chance-average' };
+                    return { label: 'Higher chance', className: 'chance-higher' };
+                } else {
+                    if (val < 4.0) return { label: 'Lower chance', className: 'chance-lower' };
+                    if (val <= 5.8) return { label: 'Around-average chance', className: 'chance-average' };
+                    return { label: 'Higher chance', className: 'chance-higher' };
+                }
+            }
+
+            // 4. API Request & Display
+            const resultsCard = document.getElementById('stage3ResultsCard');
+            const pct1yr = document.getElementById('pct1yr');
+            const pct2yr = document.getElementById('pct2yr');
+            const badge1yr = document.getElementById('badge1yr');
+            const badge2yr = document.getElementById('badge2yr');
+            const factorsList = document.getElementById('s3FactorsList');
+
+            // 4a. Restore the current assessment's Stage 3 projection if it has
+            // already been generated. Navigation must never lose state, so a
+            // returning user sees the same horizons/profile again instead of
+            // an empty page. The restore only applies when the stored result
+            // belongs to the CURRENT assessment (matching carried profile).
+            (function restoreStage3Result() {
+                try {
+                    const stored = localStorage.getItem('diabeta_stage3_result');
+                    if (!stored || !patientProfile || !patientProfile.Age) return;
+                    const s3 = JSON.parse(stored);
+                    if (!s3 || !s3.time_horizons) return;
+
+                    const sameAssessment =
+                        String(s3.payload?.Age) === String(patientProfile.Age) &&
+                        String(s3.payload?.Hypertension) === String(patientProfile.Hypertension == 1 ? '1' : '0');
+                    if (!sameAssessment) return;
+
+                    const p1 = Number(s3.time_horizons['1_year']?.percentage || s3.risk_percentage_1yr || 0);
+                    const p2 = Number(s3.time_horizons['2_year']?.percentage || s3.risk_percentage_2yr || 0);
+
+                    pct1yr.textContent = p1.toFixed(2) + '%';
+                    pct2yr.textContent = p2.toFixed(2) + '%';
+
+                    const interp1 = getHorizonInterpretation('1_year', p1);
+                    if (badge1yr) {
+                        badge1yr.textContent = interp1.label;
+                        badge1yr.className = 'chance-badge ' + interp1.className;
+                    }
+
+                    const interp2 = getHorizonInterpretation('2_year', p2);
+                    if (badge2yr) {
+                        badge2yr.textContent = interp2.label;
+                        badge2yr.className = 'chance-badge ' + interp2.className;
+                    }
+
+                    renderProjectionPlot(p1, p2);
+
+                    if (s3.features_evaluated) {
+                        factorsList.innerHTML = '';
+                        Object.entries(s3.features_evaluated).forEach(([k, v]) => {
+                            const div = document.createElement('div');
+                            div.innerHTML = `<dt>${k.replace(/_/g, ' ')}</dt><dd>${v}</dd>`;
+                            factorsList.appendChild(div);
+                        });
+                    }
+
+                    resultsCard.style.display = 'block';
+                } catch (_) { /* never block the page on restore failure */ }
+            })();
+
+            // 4b. Projection plot - visual guide between the 1-year and 2-year model predictions.
+            // Points represent the model estimates at 1-year and 2-year horizons.
+            // The dashed connecting line is purely a visual guide and does not imply intermediate measurement.
+            function renderProjectionPlot(p1, p2) {
+                const svg = document.getElementById('projectionPlotSvg');
+                if (!svg) return;
+                const pts = [
+                    { year: 1, label: '1-Year', value: p1 },
+                    { year: 2, label: '2-Year', value: p2 }
+                ].filter(pt => isFinite(pt.value));
+                if (pts.length < 2) { svg.innerHTML = ''; return; }
+
+                const W = 640, H = 260;
+                const padL = 60, padR = 60, padT = 40, padB = 50;
+                const plotW = W - padL - padR;
+                const plotH = H - padT - padB;
+                const maxVal = Math.max(...pts.map(pt => pt.value));
+                const scaleMax = Math.max(6, Math.ceil(maxVal / 2) * 2 + 2);
+
+                const x = (year) => year === 1 ? padL + 0.25 * plotW : padL + 0.75 * plotW;
+                const y = (val) => padT + (1 - val / scaleMax) * plotH;
+
+                const pointColors = { 1: '#1767b3', 2: '#0e2f56' };
+
+                // Y-axis gridlines
+                let grid = '';
+                const steps = 4;
+                for (let g = 0; g <= steps; g++) {
+                    const frac = g / steps;
+                    const val = frac * scaleMax;
+                    const gy = y(val);
+                    grid += `<line x1="${padL}" y1="${gy}" x2="${W - padR}" y2="${gy}" stroke="#e2e8f0" stroke-width="1"/>`;
+                    grid += `<text x="${padL - 10}" y="${gy + 4}" text-anchor="end" font-size="11" fill="#718096">${val.toFixed(1)}%</text>`;
+                }
+
+                const x1 = x(1), y1 = y(p1);
+                const x2 = x(2), y2 = y(p2);
+
+                let markers = '';
+                pts.forEach(pt => {
+                    const cx = x(pt.year);
+                    const cy = y(pt.value);
+                    markers += `<circle cx="${cx}" cy="${cy}" r="6" fill="${pointColors[pt.year]}" stroke="#ffffff" stroke-width="2"/>`;
+                    markers += `<text x="${cx}" y="${cy - 12}" text-anchor="middle" font-size="13" font-weight="700" fill="#0e2f56">${pt.value.toFixed(2)}%</text>`;
+                    markers += `<text x="${cx}" y="${H - 18}" text-anchor="middle" font-size="12" font-weight="600" fill="#33475b">${pt.label} Future Risk</text>`;
+                });
+
+                svg.innerHTML = `
+                    ${grid}
+                    <line x1="${padL}" y1="${y(0)}" x2="${W - padR}" y2="${y(0)}" stroke="#94a3b8" stroke-width="1.5"/>
+                    <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#0e2f56" stroke-width="2.5" stroke-dasharray="6,4"/>
+                    ${markers}
+                `;
+            }
+
+            async function triggerStage3Calculation(payload) {
+                // Defensive eligibility check (stops direct-navigation bypass):
+                // never call the API for a Stage 2 HIGH patient (Rule 1, 2, or 4),
+                // and never render future-risk output for them.
+                if (stage3Blocked) {
+                    const naBanner = document.getElementById('stage3NotApplicableBanner');
+                    if (naBanner) naBanner.style.display = 'block';
+                    return;
+                }
+                // Carry the actual Stage 2 laboratory values + final tier to the
+                // backend so it can independently enforce the eligibility
+                // safeguard (never trust a client-supplied flag alone).
+                if (patientProfile) {
+                    if (typeof patientProfile.hba1c !== 'undefined') payload.hba1c = patientProfile.hba1c;
+                    if (typeof patientProfile.fasting_glucose !== 'undefined') payload.fasting_glucose = patientProfile.fasting_glucose;
+                    if (typeof patientProfile.tier !== 'undefined') payload.stage2_tier = patientProfile.tier;
+                }
+                formError.style.display = 'none';
+                if (genBtn) { genBtn.disabled = true; genBtn.textContent = 'Calculating…'; }
+
+                try {
+                    const response = await fetch(`${BACKEND_URL}/api/predict-stage3`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const err = await response.json().catch(() => ({}));
+                        throw new Error(err.error || 'Stage 3 calculation failed.');
+                    }
+
+                    const data = await response.json();
+                    const horizons = data.time_horizons || {};
+
+                    // Horizons (strictly 1-year and 2-year model outputs)
+                    const p1 = Number(horizons['1_year']?.percentage || data.risk_percentage_1yr || 0);
+                    const p2 = Number(horizons['2_year']?.percentage || data.risk_percentage_2yr || data.risk_percentage || 0);
+
+                    // Persist the Stage 3 result as part of the CURRENT assessment
+                    try {
+                        localStorage.setItem('diabeta_stage3_result', JSON.stringify({
+                            generatedAt: new Date().toISOString(),
+                            payload: payload,
+                            time_horizons: horizons,
+                            risk_percentage_1yr: p1,
+                            risk_percentage_2yr: p2,
+                            features_evaluated: data.features_evaluated || null
+                        }));
+                    } catch (_) {}
+
+                    pct1yr.textContent = p1.toFixed(2) + '%';
+                    pct2yr.textContent = p2.toFixed(2) + '%';
+
+                    const interp1 = getHorizonInterpretation('1_year', p1);
+                    if (badge1yr) {
+                        badge1yr.textContent = interp1.label;
+                        badge1yr.className = 'chance-badge ' + interp1.className;
+                    }
+
+                    const interp2 = getHorizonInterpretation('2_year', p2);
+                    if (badge2yr) {
+                        badge2yr.textContent = interp2.label;
+                        badge2yr.className = 'chance-badge ' + interp2.className;
+                    }
+
+                    renderProjectionPlot(p1, p2);
+
+                    // Evaluated factors (human-friendly labels only, no raw variable names)
+                    factorsList.innerHTML = '';
+                    const feats = data.features_evaluated || payload;
+                    const factorLabelMap = {
+                        'Age': 'Age',
+                        'Sex': 'Sex',
+                        'Hypertension': 'Hypertension',
+                        'High_Cholesterol': 'High Cholesterol',
+                        'Heart_Disease': 'Heart Disease',
+                        'Stroke': 'Stroke',
+                        'Chronic_Condition_Count': 'Chronic Condition Count'
+                    };
+                    Object.entries(feats).forEach(([k, v]) => {
+                        if (['sn256', 'sx060_r', 'sz101', 'sz105', 'sz106', 'sz103', 'sz104', 'sz107', 'sz108', 'sz122', 'sz123', 'sz124', 'sz080', 'hba1c', 'fasting_glucose', 'stage2_tier'].includes(k.toLowerCase())) return;
+                        const label = factorLabelMap[k] || k.replace(/_/g, ' ');
+                        const div = document.createElement('div');
+                        div.innerHTML = `<dt>${label}</dt><dd>${v}</dd>`;
+                        factorsList.appendChild(div);
+                    });
+
+                    resultsCard.style.display = 'block';
+                    resultsCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                } catch (err) {
+                    formError.textContent = err.message || 'Something went wrong.';
+                    formError.style.display = 'block';
+                } finally {
+                    if (genBtn) { genBtn.disabled = false; genBtn.textContent = 'Prediction Over Time'; }
+                }
+            }
+
+            document.getElementById('recalcBtn')?.addEventListener('click', () => {
+                resultsCard.style.display = 'none';
+                // Recalculation re-runs the projection with the same read-only
+                // carried-forward profile - no input is ever re-collected.
+                if (carriedInputs) {
+                    triggerStage3Calculation({ ...carriedInputs });
+                }
+            });
+
+        })();
+    </script>
+</body>
+</html>

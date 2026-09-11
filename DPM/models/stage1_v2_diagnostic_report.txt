@@ -1,0 +1,147 @@
+======================================================================
+DIA BETA V2 - STAGE 1 DIAGNOSTIC / IMPROVEMENT EXPERIMENT
+======================================================================
+
+Dataset: stage1_v2_nhanes_8predictors.csv | rows=16,327 train=13,061 test=3,266 (stratified, seed 42)
+Baseline model loaded: stage1_v2_model.pkl
+
+======================================================================
+PART 1 - BASELINE MODEL DIAGNOSTICS
+======================================================================
+
+1. PERMUTATION IMPORTANCE (test set, 5 repeats, seed 42)
+----------------------------------------------------------------------
+  age                  mean=+0.1137 std=0.0045
+  family_history       mean=+0.0369 std=0.0061
+  bmi                  mean=+0.0361 std=0.0041
+  hypertension         mean=+0.0229 std=0.0031
+  race_ethnicity       mean=+0.0164 std=0.0086
+  sex                  mean=+0.0096 std=0.0051
+  smoking_status       mean=+0.0011 std=0.0034
+  physical_activity    mean=-0.0011 std=0.0023
+
+2. TOP CONTRIBUTORS (by permutation importance on macro-F1): age, family_history, bmi, hypertension
+
+3. CLASS-WISE PREDICTED-PROBABILITY DISTRIBUTIONS (test set)
+----------------------------------------------------------------------
+  Mean predicted P per true class (rows=true):
+  true          P(Low) P(Moderate)   P(High)  mean P(true)
+  Low            0.607       0.289     0.105         0.607
+  Moderate       0.423       0.374     0.203         0.374
+  High           0.275       0.372     0.354         0.354
+
+4. ERROR ANALYSIS (test set, true vs predicted)
+----------------------------------------------------------------------
+  Confusion matrix (rows=true, cols=pred, Low/Moderate/High):
+    Low         1159    307     86
+    Moderate     477    443    182
+    High          94    247    271
+
+  Error pairs (true -> predicted): count, mean P(pred), mean P(true), mean age, mean BMI
+    Low -> Moderate  n= 307  P(Moderate)=0.475  P(Low)=0.336  age=60.9  bmi=29.6
+    Low -> High      n=  86  P(High)=0.471  P(Low)=0.208  age=60.9  bmi=33.9
+    Moderate -> Low       n= 477  P(Low)=0.622  P(Moderate)=0.299  age=41.5  bmi=28.0
+    Moderate -> High      n= 182  P(High)=0.481  P(Moderate)=0.330  age=64.3  bmi=34.1
+    High -> Low       n=  94  P(Low)=0.555  P(High)=0.127  age=43.9  bmi=29.5
+    High -> Moderate  n= 247  P(Moderate)=0.455  P(High)=0.267  age=63.6  bmi=30.8
+
+5. MISSING-VALUE HANDLING AUDIT
+----------------------------------------------------------------------
+  Missing counts in training data (imputers are fitted on train):
+    bmi                  189 (1.45%) -> imputed with 28.3 (median)
+    family_history       229 (1.75%) -> imputed with 0 (mode)
+    hypertension         17 (0.13%) -> imputed with 0 (mode)
+    physical_activity    2 (0.02%) -> imputed with 0 (mode)
+    smoking_status       8 (0.06%) -> imputed with 0 (mode)
+  Missingness is low (<2% per predictor); the indicator-column experiment tests whether the missing pattern itself carries signal.
+
+6. LIMITATION ASSESSMENT
+----------------------------------------------------------------------
+  Moderate class: 43.3% of true Moderate predicted Low, 16.5% predicted High (true Moderate rate = 40.2%).
+  Low class: 19.8% of true Low predicted Moderate.
+  High class: 40.4% of true High predicted Moderate.
+  Evidence points to CLASS OVERLAP: the Moderate band (5.7-6.4 HbA1c / 100-125 glucose) is a broad middle zone that straddles Low and High in 8 non-laboratory features, so the model necessarily trades Moderate errors against Low/High errors.
+
+Experiments planned: baseline_hgb, hgb_lr05, hgb_capacity, hgb_regularized, hgb_ordinal_cats, hgb_missing_ind
+
+======================================================================
+PART 2 - CONTROLLED EXPERIMENTS (5-fold stratified CV, seed 42)
+======================================================================
+
+  baseline_hgb  (current config (one-hot cats, median/mode impute, max_iter=300))
+    CV macro-F1=0.5175  macro-recall=0.5154  acc=0.5558  ROC-AUC=0.7355  (2s)
+    Moderate P/R/F1: 0.4289/0.3984/0.4131   High P/R/F1: 0.4785/0.4312/0.4536
+
+  hgb_lr05  (lower learning rate, more iterations (0.05 / 600))
+    CV macro-F1=0.5186  macro-recall=0.5162  acc=0.5588  ROC-AUC=0.7371  (3s)
+    Moderate P/R/F1: 0.4337/0.4014/0.4169   High P/R/F1: 0.4770/0.4230/0.4484
+
+  hgb_capacity  (higher capacity (max_leaf_nodes=127, min_samples_leaf=5))
+    CV macro-F1=0.5026  macro-recall=0.5009  acc=0.5441  ROC-AUC=0.7195  (5s)
+    Moderate P/R/F1: 0.4215/0.3859/0.4029   High P/R/F1: 0.4531/0.4059/0.4282
+
+  hgb_regularized  (stronger regularization (leaf=15, min_leaf=40, l2=1.0))
+    CV macro-F1=0.5217  macro-recall=0.5191  acc=0.5604  ROC-AUC=0.7399  (1s)
+    Moderate P/R/F1: 0.4339/0.4002/0.4164   High P/R/F1: 0.4880/0.4324/0.4585
+
+  hgb_ordinal_cats  (categoricals ordinal-encoded instead of one-hot)
+    CV macro-F1=0.5157  macro-recall=0.5128  acc=0.5543  ROC-AUC=0.7338  (2s)
+    Moderate P/R/F1: 0.4282/0.4020/0.4147   High P/R/F1: 0.4787/0.4218/0.4484
+
+  hgb_missing_ind  (missing-value indicator columns added (num + cat))
+    CV macro-F1=0.5133  macro-recall=0.5111  acc=0.5528  ROC-AUC=0.7347  (2s)
+    Moderate P/R/F1: 0.4240/0.3950/0.4090   High P/R/F1: 0.4721/0.4218/0.4455
+
+  SELECTED by CV macro-F1 (tiebreak macro-recall): hgb_regularized
+
+======================================================================
+PART 3 - FINAL TEST EVALUATION (untouched test set)
+======================================================================
+
+  baseline_hgb
+    Test macro-F1=0.5331  macro-recall=0.5305  acc=0.5735  ROC-AUC=0.7468
+    Moderate P/R/F1: 0.4443/0.4020/0.4221   High P/R/F1: 0.5028/0.4428/0.4709
+
+  hgb_lr05
+    Test macro-F1=0.5369  macro-recall=0.5346  acc=0.5759  ROC-AUC=0.7466
+    Moderate P/R/F1: 0.4488/0.4020/0.4241   High P/R/F1: 0.5101/0.4542/0.4806
+
+  hgb_capacity
+    Test macro-F1=0.5147  macro-recall=0.5123  acc=0.5591  ROC-AUC=0.7326
+    Moderate P/R/F1: 0.4277/0.3866/0.4061   High P/R/F1: 0.4754/0.4101/0.4404
+
+  hgb_regularized
+    Test macro-F1=0.5454  macro-recall=0.5417  acc=0.5793  ROC-AUC=0.7493
+    Moderate P/R/F1: 0.4531/0.4211/0.4365   High P/R/F1: 0.5315/0.4690/0.4983
+
+  hgb_ordinal_cats
+    Test macro-F1=0.5276  macro-recall=0.5259  acc=0.5671  ROC-AUC=0.7418
+    Moderate P/R/F1: 0.4357/0.3902/0.4117   High P/R/F1: 0.4973/0.4477/0.4712
+
+  hgb_missing_ind
+    Test macro-F1=0.5422  macro-recall=0.5403  acc=0.5796  ROC-AUC=0.7468
+    Moderate P/R/F1: 0.4563/0.4074/0.4305   High P/R/F1: 0.5144/0.4673/0.4897
+
+======================================================================
+PART 4 - DECISION
+======================================================================
+  Candidate from CV: hgb_regularized
+  Test macro-F1 gain vs baseline: +0.0123 (required >= +0.010)
+  Moderate F1 change: -0.0144 (allowed drop <= 0.020)
+  High F1 change:     -0.0274 (allowed drop <= 0.020)
+  High recall change: -0.0261 (allowed drop <= 0.020)
+
+  IMPROVED CANDIDATE FOUND: hgb_regularized
+  Saved: C:\Users\samuel ucheoma\Documents\ML_Project\diabeta\diabeta\DPM\models\stage1_v2_candidate.pkl
+
+======================================================================
+FINAL SUMMARY
+======================================================================
+BASELINE (HistGradientBoosting, current):
+  CV macro-F1=0.5175  test macro-F1=0.5331  test macro-recall=0.5305  test ROC-AUC=0.7468
+  Moderate F1=0.4221 recall=0.4020  High F1=0.4709 recall=0.4428
+
+SELECTED: hgb_regularized
+  DECISION: ACCEPT as stage1_v2_candidate.pkl (review before any production switch)
+
+Total elapsed: 26s

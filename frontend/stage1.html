@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage 1: Diabetes Risk Screener — DiaBeta</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Playfair+Display:wght@400;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .stage1-badge {
+            display: inline-block;
+            background: #0e2f56;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+        }
+
+        .stage1-title-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+
+        .stage1-title-row .secondary-action {
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+
+        .stage1-purpose {
+            max-width: 720px;
+            color: #464542;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        /* ============================================================
+           BMI CALCULATOR
+        ============================================================ */
+
+        .bmi-calc-wrapper {
+            margin-bottom: 4px;
+        }
+
+        .bmi-toggle-btn {
+            background: #f0f4f8;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .bmi-panel {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 8px;
+            background: #fafafa;
+        }
+
+        .bmi-inputs label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .bmi-inputs input {
+            margin-left: 6px;
+            width: 100px;
+        }
+
+        #bmiComputeBtn {
+            margin-top: 6px;
+            padding: 5px 14px;
+            cursor: pointer;
+        }
+
+        #bmiResultPreview {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #2a6f2a;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body class="stage1-page">
+
+    <!-- ============================================================
+         COLD START LOADING OVERLAY
+    ============================================================ -->
+
+    <div
+        id="coldStartOverlay"
+        class="cold-start-overlay"
+        aria-live="polite"
+        aria-busy="true"
+    >
+
+        <div class="cold-start-content">
+
+            <img
+                class="cold-start-logo"
+                src="diabeta-logo.png"
+                alt="DiaBeta"
+            >
+
+            <div class="cold-start-spinner"></div>
+
+            <h2 id="coldStartTitle">
+                Preparing screener
+            </h2>
+
+            <p id="coldStartMessage">
+                Connecting to DiaBeta…
+            </p>
+
+            <div class="cold-start-progress">
+                <div
+                    class="cold-start-progress-fill"
+                    id="coldStartProgress"
+                ></div>
+            </div>
+
+            <button
+                id="continueAnywayBtn"
+                type="button"
+                style="
+                    display:none;
+                    margin-top:18px;
+                    padding:10px 18px;
+                    border:0;
+                    border-radius:8px;
+                    cursor:pointer;
+                    font-weight:600;
+                "
+            >
+                Continue to DiaBeta
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================================================
+         MAIN APPLICATION
+    ============================================================ -->
+
+    <main class="page-shell">
+
+        <!-- HEADER -->
+        <header class="result-header">
+
+            <a
+                class="brand-mark"
+                href="index.html"
+                aria-label="DiaBeta home"
+            >
+                <img src="diabeta-logo.png" alt="DiaBeta logo">
+                <span>DiaBeta</span>
+            </a>
+
+            <button
+                class="nav-toggle"
+                type="button"
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+                data-drawer-toggle
+            >
+                <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <rect x="3" y="3" width="7" height="7" rx="2" />
+                    <rect x="14" y="3" width="7" height="7" rx="2" />
+                    <rect x="3" y="14" width="7" height="7" rx="2" />
+                    <rect x="14" y="14" width="7" height="7" rx="2" />
+                </svg>
+            </button>
+
+            <!-- DESKTOP NAVIGATION -->
+            <nav class="top-nav" aria-label="Main navigation">
+                <a href="stage1.html" class="active" style="font-weight: 700; color: #0e2f56;">Stage 1 Screener</a>
+                <a href="stage2.html">Stage 2 Risk</a>
+                <a href="stage3.html">Stage 3 Time-Based</a>
+                <a href="records.html">Records</a>
+                <a href="about.html">About</a>
+                <a href="about_me.html">About Me</a>
+                <span class="assessment-pill">Screener</span>
+            </nav>
+
+        </header>
+
+        <!-- MOBILE DRAWER -->
+        <div class="drawer-overlay" aria-hidden="true"></div>
+
+        <aside class="side-drawer" aria-hidden="true">
+            <button class="drawer-close" type="button" aria-label="Close navigation menu" data-drawer-close>&times;</button>
+            <nav class="drawer-nav" aria-label="Mobile navigation">
+                <a href="stage1.html">Stage 1 Screener</a>
+                <a href="stage2.html">Stage 2 Risk</a>
+                <a href="stage3.html">Stage 3 Time-Based</a>
+                <a href="records.html">Records</a>
+                <a href="about.html">About</a>
+                <a href="about_me.html">About Me</a>
+            </nav>
+        </aside>
+
+
+        <!-- ========================================================
+             STAGE 1 HERO / HEADER
+        ======================================================== -->
+
+        <section class="page-hero">
+
+            <div class="stage1-title-row">
+
+                <div>
+                    <span class="stage1-badge">Stage 1 — Screener</span>
+                    <h1 style="margin-top: 8px;">Diabetes Risk Screener</h1>
+                    <p class="stage1-purpose" style="margin-top: 12px;">
+                        A focused first screen of a patient's diabetes risk using
+                        demographics, BMI, and key clinical and lifestyle history —
+                        no laboratory values are needed. After the screener you can
+                        continue to the detailed risk assessment or straight to the
+                        time-based projections.
+                    </p>
+                </div>
+
+                <button
+                    class="secondary-action"
+                    type="button"
+                    id="newAssessmentBtn"
+                >
+                    Start New Assessment
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             SCREENER FORM AREA
+        ======================================================== -->
+
+        <div class="assessment-layout">
+
+            <!-- SUMMARY -->
+            <aside
+                class="assessment-summary"
+                aria-label="Clinical assessment summary"
+            >
+
+                <p class="eyebrow">
+                    Clinical assessment
+                </p>
+
+                <h2>
+                    Enter patient clinical parameters.
+                </h2>
+
+                <p class="summary-copy">
+                    Designed to assist healthcare professionals
+                    in evaluating a patient's risk of diabetes
+                    using clinical parameters and machine learning.
+                </p>
+
+                <div class="summary-metrics">
+
+                    <div>
+
+                        <strong>
+                            10
+                        </strong>
+
+                        <span>
+                            inputs
+                        </span>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            1
+                        </strong>
+
+                        <span>
+                            result
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </aside>
+
+
+            <!-- FORM -->
+            <form
+                class="assessment-form"
+                id="assessmentForm"
+            >
+
+                <div class="form-grid">
+
+                    <!-- PATIENT NAME -->
+                    <label class="field">
+                        <span>Patient Name</span>
+                        <input
+                            type="text"
+                            name="patient_name"
+                            placeholder="Full name"
+                            required
+                        >
+                    </label>
+
+                    <!-- PATIENT ADDRESS -->
+                    <label class="field">
+                        <span>Patient Address</span>
+                        <input
+                            type="text"
+                            name="patient_address"
+                            placeholder="Home address"
+                            required
+                        >
+                    </label>
+
+                    <!-- AGE -->
+                    <label class="field">
+                        <span>Age</span>
+                        <input
+                            type="number"
+                            name="age"
+                            min="1"
+                            max="120"
+                            placeholder="45"
+                            required
+                        >
+                    </label>
+
+                    <!-- SEX -->
+                    <label class="field">
+                        <span>Sex</span>
+                        <select name="sex" required>
+                            <option value="" disabled selected>Select sex</option>
+                            <option value="0">Female</option>
+                            <option value="1">Male</option>
+                        </select>
+                    </label>
+
+                    <!-- BMI CALCULATOR -->
+                    <div class="field field-wide bmi-calc-wrapper">
+
+                        <button
+                            type="button"
+                            id="bmiToggleBtn"
+                            class="bmi-toggle-btn"
+                        >
+                            BMI Calculator
+                            (optional helper)
+                        </button>
+
+                        <div
+                            id="bmiPanel"
+                            class="bmi-panel"
+                            style="display:none;"
+                        >
+
+                            <div class="bmi-inputs">
+
+                                <label>
+                                    Weight (kg):
+                                    <input
+                                        type="number"
+                                        id="bmiWeightKg"
+                                        step="0.1"
+                                        min="0"
+                                    >
+                                </label>
+
+                                <label>
+                                    Height (cm):
+                                    <input
+                                        type="number"
+                                        id="bmiHeightCm"
+                                        step="0.1"
+                                        min="0"
+                                    >
+                                </label>
+
+                            </div>
+
+                            <button
+                                type="button"
+                                id="bmiComputeBtn"
+                            >
+                                Calculate
+                            </button>
+
+                            <div id="bmiResultPreview"></div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- BMI -->
+                    <label class="field">
+                        <span>
+                            BMI
+                            <small>(kg/m²)</small>
+                        </span>
+                        <input
+                            type="number"
+                            step="0.1"
+                            name="bmi"
+                            min="1"
+                            placeholder="27.5"
+                            required
+                        >
+                    </label>
+
+                    <!-- FAMILY HISTORY -->
+                    <label class="field">
+                        <span>Family History of Diabetes</span>
+                        <select name="family_history" required>
+                            <option value="" disabled selected>Select family history</option>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                        <small>Immediate biological relatives</small>
+                    </label>
+
+                    <!-- HYPERTENSION -->
+                    <label class="field">
+                        <span>Hypertension</span>
+                        <select name="hypertension" required>
+                            <option value="" disabled selected>Select</option>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </label>
+
+                    <!-- PHYSICAL ACTIVITY -->
+                    <label class="field">
+                        <span>
+                            Physical Activity
+                            <small>(recreational)</small>
+                        </span>
+                        <select name="physical_activity" required>
+                            <option value="" disabled selected>Select</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </label>
+
+                    <!-- SMOKING STATUS -->
+                    <label class="field">
+                        <span>Smoking Status</span>
+                        <select name="smoking_status" required>
+                            <option value="" disabled selected>Select</option>
+                            <option value="0">Never</option>
+                            <option value="1">Former</option>
+                            <option value="2">Current</option>
+                        </select>
+                    </label>
+
+                    <!-- RACE / ETHNICITY -->
+                    <!--
+                         Options are listed statically (same codes/labels served by
+                         /api/race-map) so the dropdown always works immediately,
+                         even before/without the backend race-map request.
+                    -->
+                    <label class="field field-wide">
+                        <span>Race/Ethnicity</span>
+                        <select name="race_ethnicity" id="raceSelect" required>
+                            <option value="" disabled selected>Select race or ethnicity</option>
+                            <option value="1">Mexican American</option>
+                            <option value="2">Other Hispanic</option>
+                            <option value="3">Non-Hispanic White</option>
+                            <option value="4">Non-Hispanic Black</option>
+                            <option value="6">Non-Hispanic Asian</option>
+                            <option value="7">Other / Multi-racial</option>
+                        </select>
+                    </label>
+
+                </div>
+
+                <!-- SUBMIT -->
+                <button
+                    class="primary-action"
+                    type="submit"
+                    id="submitBtn"
+                >
+                    Estimate risk
+                </button>
+
+                <p
+                    id="formError"
+                    style="
+                        color:#d64554;
+                        margin-top:12px;
+                        display:none;
+                    "
+                ></p>
+
+            </form>
+
+        </div>
+
+    </main>
+
+
+    <!-- ============================================================
+         JAVASCRIPT
+    ============================================================ -->
+
+    <script>
+
+        /* ============================================================
+           BACKEND CONFIGURATION
+        ============================================================ */
+
+        const BACKEND_URL =
+            (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:")
+                ? "http://127.0.0.1:5000"
+                : "https://diabeta-2.onrender.com";
+
+
+        /* ============================================================
+           TEMPORARY ASSESSMENT STATE
+           The current assessment lives in temporary storage
+           (diabeta_last_result + diabeta_stage2_hybrid_result). Navigating
+           between stages NEVER clears or restarts it: Stage 1 re-renders
+           the stored current assessment on every arrival, and Stage 2/
+           Stage 3 read from it as before. The ONLY reset is the explicit
+           "Start New Assessment" button (clearTemporaryAssessmentState).
+           Saved historical records (diabetaRecords) are NEVER touched
+           here.
+        ============================================================ */
+
+        function clearTemporaryAssessmentState() {
+            try {
+                localStorage.removeItem("diabeta_last_result");
+                localStorage.removeItem("diabeta_stage2_hybrid_result");
+                localStorage.removeItem("diabeta_stage3_result");
+                localStorage.removeItem("diabeta_current_assessment");
+                sessionStorage.removeItem("diabeta_stage2_form_state");
+            } catch (_) { /* storage unavailable - ignore */ }
+        }
+
+
+        /* ============================================================
+           COLD START / BACKEND CONNECTION
+        ============================================================ */
+
+        (function () {
+
+            const overlay = document.getElementById("coldStartOverlay");
+            const title = document.getElementById("coldStartTitle");
+            const message = document.getElementById("coldStartMessage");
+            const progress = document.getElementById("coldStartProgress");
+            const continueBtn = document.getElementById("continueAnywayBtn");
+
+            const MAX_WAIT = 30000;
+            const CHECK_INTERVAL = 2500;
+            const HEALTH_TIMEOUT = 5000;
+
+            let backendReady = false;
+            let startTime = Date.now();
+
+            async function checkHealth() {
+
+                try {
+
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), HEALTH_TIMEOUT);
+
+                    const response = await fetch(`${BACKEND_URL}/health`, {
+                        method: "GET",
+                        cache: "no-store",
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(timeout);
+
+                    if (response.ok) {
+                        backendReady = true;
+                        return true;
+                    }
+
+                } catch (error) {
+                    console.log("Waiting for backend...");
+                }
+
+                return false;
+
+            }
+
+            function hideOverlay() {
+
+                if (!overlay) {
+                    return;
+                }
+
+                overlay.setAttribute("aria-busy", "false");
+                overlay.classList.add("hidden");
+
+                setTimeout(() => {
+                    if (overlay) {
+                        overlay.remove();
+                    }
+                }, 500);
+
+            }
+
+            function backendConnected() {
+
+                backendReady = true;
+
+                if (title) {
+                    title.textContent = "DiaBeta is ready";
+                }
+
+                if (message) {
+                    message.textContent = "Ready to perform your screener.";
+                }
+
+                if (progress) {
+                    progress.style.width = "100%";
+                }
+
+                loadRaceMap();
+
+                setTimeout(() => {
+                    hideOverlay();
+                }, 300);
+
+            }
+
+            function backendSlow() {
+
+                if (title) {
+                    title.textContent = "Server is waking up";
+                }
+
+                if (message) {
+                    message.textContent = "The DiaBeta server is taking longer than usual to start. You can continue to the screener.";
+                }
+
+                if (continueBtn) {
+
+                    continueBtn.style.display = "inline-block";
+
+                    continueBtn.onclick = () => {
+                        hideOverlay();
+                        loadRaceMap();
+                    };
+
+                }
+
+            }
+
+            const progressTimer = setInterval(() => {
+
+                if (!progress) {
+                    return;
+                }
+
+                const elapsed = Date.now() - startTime;
+                const percentage = Math.min(90, (elapsed / MAX_WAIT) * 100);
+                progress.style.width = percentage + "%";
+
+            }, 300);
+
+            async function waitForBackend() {
+
+                if (await checkHealth()) {
+                    clearInterval(progressTimer);
+                    backendConnected();
+                    return;
+                }
+
+                if (message) {
+                    message.textContent = "Waking the DiaBeta server… this can take a few moments on first visit.";
+                }
+
+                while (!backendReady && Date.now() - startTime < MAX_WAIT) {
+
+                    await new Promise(resolve => setTimeout(resolve, CHECK_INTERVAL));
+
+                    if (await checkHealth()) {
+                        clearInterval(progressTimer);
+                        backendConnected();
+                        return;
+                    }
+
+                }
+
+                clearInterval(progressTimer);
+                backendSlow();
+
+            }
+
+            waitForBackend();
+
+        })();
+
+
+        /* ============================================================
+           LOAD RACE / ETHNICITY MAP
+        ============================================================ */
+
+        async function loadRaceMap() {
+
+            try {
+
+                const response = await fetch(`${BACKEND_URL}/api/race-map`, { cache: "no-store" });
+
+                if (!response.ok) {
+                    throw new Error("Failed to load race map");
+                }
+
+                const raceMap = await response.json();
+                const select = document.getElementById("raceSelect");
+
+                if (!select) {
+                    return;
+                }
+
+                // Keep any ethnicity the user already picked when refreshing
+                // the option list from the backend.
+                const previouslySelected = select.value;
+
+                select.innerHTML = `
+                    <option
+                        value=""
+                        disabled
+                        selected
+                    >
+                        Select race or ethnicity
+                    </option>
+                `;
+
+                Object.entries(raceMap).forEach(([code, label]) => {
+
+                    const option = document.createElement("option");
+                    option.value = code;
+                    option.textContent = label;
+                    select.appendChild(option);
+
+                });
+
+                if (previouslySelected && previouslySelected !== "") {
+                    select.value = previouslySelected;
+                }
+
+            } catch (error) {
+
+                console.error("Failed to load race map:", error);
+
+            }
+
+        }
+
+
+        /* ============================================================
+           BMI CALCULATOR
+        ============================================================ */
+
+        (function () {
+
+            const toggleBtn = document.getElementById("bmiToggleBtn");
+            const panel = document.getElementById("bmiPanel");
+            const computeBtn = document.getElementById("bmiComputeBtn");
+            const resultPreview = document.getElementById("bmiResultPreview");
+
+            if (!toggleBtn || !panel || !computeBtn) {
+                return;
+            }
+
+            toggleBtn.addEventListener("click", () => {
+                panel.style.display = panel.style.display === "none" ? "block" : "none";
+            });
+
+            computeBtn.addEventListener("click", () => {
+
+                const weightKg = parseFloat(document.getElementById("bmiWeightKg").value);
+                const heightCm = parseFloat(document.getElementById("bmiHeightCm").value);
+
+                if (!weightKg || !heightCm) {
+                    resultPreview.textContent = "Enter weight and height";
+                    return;
+                }
+
+                const heightM = heightCm / 100;
+                let bmi = weightKg / (heightM * heightM);
+                bmi = Math.round(bmi * 10) / 10;
+
+                resultPreview.textContent = `BMI: ${bmi} — enter this into the BMI field below`;
+
+                const bmiInput = document.querySelector('input[name="bmi"]');
+                if (bmiInput) {
+                    bmiInput.value = bmi;
+                }
+
+            });
+
+        })();
+
+
+        /* ============================================================
+           FORM SUBMISSION
+        ============================================================ */
+
+        document
+            .getElementById("assessmentForm")
+            .addEventListener("submit", async (e) => {
+
+                e.preventDefault();
+
+                const btn = document.getElementById("submitBtn");
+                const errEl = document.getElementById("formError");
+
+                errEl.style.display = "none";
+                btn.disabled = true;
+                btn.textContent = "Estimating…";
+
+                const formData = new FormData(e.target);
+                const famHistRaw = formData.get("family_history");
+
+                const payload = {
+
+                    patient_name: formData.get("patient_name") || "",
+                    patient_address: formData.get("patient_address") || "",
+                    age: formData.get("age"),
+                    sex: formData.get("sex"),
+                    bmi: formData.get("bmi"),
+                    race_ethnicity: formData.get("race_ethnicity"),
+                    family_history: famHistRaw !== null && famHistRaw !== "" ? famHistRaw : null,
+                    hypertension: formData.get("hypertension"),
+                    physical_activity: formData.get("physical_activity"),
+                    smoking_status: formData.get("smoking_status")
+
+                };
+
+                try {
+
+                    const response = await fetch(`${BACKEND_URL}/api/predict`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.error || "Prediction failed");
+
+                    }
+
+                    const result = await response.json();
+
+                    /* ================================================
+                       STORE LAST RESULT
+                    ================================================ */
+
+                    const fullResult = {
+
+                        id: Date.now().toString(),
+                        createdAt: new Date().toISOString(),
+                        tier: result.tier,
+                        probability: result.prob_high,
+                        person: result.person,
+                        reason: result.reason,
+                        shap: result.shap_explanation
+
+                    };
+
+                    localStorage.setItem("diabeta_last_result", JSON.stringify(fullResult));
+                    try {
+                        const existingDraft = JSON.parse(localStorage.getItem("diabeta_current_assessment") || "{}");
+                        localStorage.setItem("diabeta_current_assessment", JSON.stringify({
+                            ...existingDraft,
+                            ...payload,
+                            stage1_completed: true
+                        }));
+                    } catch (_) {}
+
+                    /* ================================================
+                       SAVE RECORD (historical records only)
+                    ================================================ */
+
+                    try {
+
+                        const records = JSON.parse(localStorage.getItem("diabetaRecords") || "[]");
+                        records.unshift(fullResult);
+                        localStorage.setItem("diabetaRecords", JSON.stringify(records.slice(0, 50)));
+
+                    } catch (_) {
+
+                        console.warn("Unable to save record locally.");
+
+                    }
+
+                    /* ================================================
+                       RESULT PAGE
+                    ================================================ */
+
+                    window.location.href = "result.html";
+
+                } catch (error) {
+
+                    console.error("Prediction error:", error);
+
+                    errEl.textContent = error.message || "Something went wrong. Please try again.";
+                    errEl.style.display = "block";
+
+                    btn.disabled = false;
+                    btn.textContent = "Estimate risk";
+
+                }
+
+            });
+
+
+        /* ============================================================
+           RESTORE CURRENT ASSESSMENT / START NEW ASSESSMENT
+           Navigation between stages must never reset the current
+           assessment. When the user arrives at (or returns to) Stage 1,
+           the screener is repopulated from the CURRENT assessment's
+           stored data (diabeta_last_result) so the user sees the same
+           information they previously entered - not a blank form. Only
+           the explicit "Start New Assessment" button clears the current
+           assessment and begins a fresh one.
+        ============================================================ */
+
+        (function () {
+
+            const form = document.getElementById("assessmentForm");
+            const bmiPanel = document.getElementById("bmiPanel");
+
+            function saveCurrentDraft() {
+                if (!form) return;
+                try {
+                    const formData = new FormData(form);
+                    const current = {
+                        patient_name: formData.get("patient_name") || "",
+                        patient_address: formData.get("patient_address") || "",
+                        age: formData.get("age") || "",
+                        sex: formData.get("sex") || "",
+                        bmi: formData.get("bmi") || "",
+                        race_ethnicity: formData.get("race_ethnicity") || "",
+                        family_history: formData.get("family_history") || "",
+                        hypertension: formData.get("hypertension") || "",
+                        physical_activity: formData.get("physical_activity") || "",
+                        smoking_status: formData.get("smoking_status") || ""
+                    };
+                    const existingDraft = JSON.parse(localStorage.getItem("diabeta_current_assessment") || "{}");
+                    if (existingDraft.hba1c) current.hba1c = existingDraft.hba1c;
+                    if (existingDraft.fasting_glucose) current.fasting_glucose = existingDraft.fasting_glucose;
+                    localStorage.setItem("diabeta_current_assessment", JSON.stringify(current));
+                } catch (_) {}
+            }
+
+            function populateFromCurrentAssessment() {
+                if (!form) return;
+
+                let person = null;
+                let s2Result = null;
+                let draft = null;
+
+                try {
+                    const stored = localStorage.getItem("diabeta_last_result");
+                    if (stored) {
+                        const parsed = JSON.parse(stored);
+                        if (parsed && parsed.person) person = parsed.person;
+                    }
+                } catch (_) {}
+
+                try {
+                    const s2Stored = localStorage.getItem("diabeta_stage2_hybrid_result");
+                    if (s2Stored) {
+                        s2Result = JSON.parse(s2Stored);
+                        if (!person && s2Result) {
+                            person = s2Result.person || s2Result;
+                        }
+                    }
+                } catch (_) {}
+
+                try {
+                    const dStored = localStorage.getItem("diabeta_current_assessment");
+                    if (dStored) draft = JSON.parse(dStored);
+                } catch (_) {}
+
+                if (!person && !draft && !s2Result) {
+                    return;
+                }
+
+                const raw = (s2Result && s2Result.raw_inputs) || draft || {};
+                const p = person || {};
+
+                const setSelectByLabel = (select, label) => {
+                    if (!select || !label) return;
+                    const match = Array.from(select.options).find(
+                        (opt) => opt.value !== "" && opt.textContent === label
+                    );
+                    if (match) select.value = match.value;
+                };
+
+                const patName = p["Patient Name"] || raw.patient_name;
+                if (patName && patName !== "Not provided") {
+                    form.elements["patient_name"].value = patName;
+                }
+
+                const patAddr = p["Patient Address"] || raw.patient_address;
+                if (patAddr && patAddr !== "Not provided") {
+                    form.elements["patient_address"].value = patAddr;
+                }
+
+                const ageVal = p.Age || raw.age;
+                if (ageVal) form.elements["age"].value = ageVal;
+
+                const bmiVal = p.BMI || raw.bmi;
+                if (bmiVal) form.elements["bmi"].value = bmiVal;
+
+                if (raw.sex !== undefined && raw.sex !== "") {
+                    if (raw.sex === "2" || raw.sex === "0" || String(raw.sex).toLowerCase().includes("female")) {
+                        form.elements["sex"].value = "0";
+                    } else if (raw.sex === "1" || String(raw.sex).toLowerCase().includes("male")) {
+                        form.elements["sex"].value = "1";
+                    }
+                } else if (p.Sex) {
+                    setSelectByLabel(form.elements["sex"], p.Sex);
+                }
+
+                if (raw.race_ethnicity) {
+                    form.elements["race_ethnicity"].value = raw.race_ethnicity;
+                } else if (p["Race/Ethnicity"]) {
+                    setSelectByLabel(form.elements["race_ethnicity"], p["Race/Ethnicity"]);
+                }
+
+                if (raw.family_history !== undefined && raw.family_history !== "") {
+                    form.elements["family_history"].value = (raw.family_history == 1 || String(raw.family_history).toLowerCase() === "yes") ? "1" : "0";
+                } else if (p["Family History"]) {
+                    setSelectByLabel(form.elements["family_history"], p["Family History"]);
+                }
+
+                if (raw.hypertension !== undefined && raw.hypertension !== "") {
+                    form.elements["hypertension"].value = (raw.hypertension == 1 || String(raw.hypertension).toLowerCase() === "yes") ? "1" : "0";
+                } else if (p.Hypertension !== undefined) {
+                    const hypVal = String(p.Hypertension).toLowerCase();
+                    form.elements["hypertension"].value = (hypVal === "yes" || p.Hypertension == 1) ? "1" : "0";
+                }
+
+                if (raw.physical_activity !== undefined && raw.physical_activity !== "") {
+                    form.elements["physical_activity"].value = (raw.physical_activity == 1 || String(raw.physical_activity).toLowerCase() === "active") ? "1" : "0";
+                } else if (p["Physical Activity"]) {
+                    setSelectByLabel(form.elements["physical_activity"], p["Physical Activity"]);
+                }
+
+                if (raw.smoking_status !== undefined && raw.smoking_status !== "") {
+                    const s = String(raw.smoking_status).toLowerCase();
+                    form.elements["smoking_status"].value = s === "current" || s === "2" ? "2" : (s === "former" || s === "1" ? "1" : "0");
+                } else if (p["Smoking Status"]) {
+                    setSelectByLabel(form.elements["smoking_status"], p["Smoking Status"]);
+                }
+            }
+
+            populateFromCurrentAssessment();
+            loadRaceMap().then(() => populateFromCurrentAssessment());
+
+            window.addEventListener("pageshow", () => {
+                populateFromCurrentAssessment();
+            });
+
+            form?.addEventListener("input", saveCurrentDraft);
+            form?.addEventListener("change", saveCurrentDraft);
+
+            /*
+             * The ONLY reset path: the explicit Start New Assessment action.
+             */
+            document.getElementById("newAssessmentBtn").addEventListener("click", () => {
+                if (!window.confirm("Start a new assessment? The current assessment will be cleared.")) {
+                    return;
+                }
+                clearTemporaryAssessmentState();
+                if (form) {
+                    form.reset();
+                }
+                if (bmiPanel) {
+                    bmiPanel.style.display = "none";
+                }
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+
+        })();
+
+    </script>
+
+
+    <!-- ============================================================
+         GLOBAL APP JAVASCRIPT
+    ============================================================ -->
+
+    <script src="app.js"></script>
+
+</body>
+</html>

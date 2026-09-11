@@ -2,26 +2,36 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
 
-# Env files
+# Env & Secrets
 .env
+.env.*
+*.env
 .venv/
 venv/
 ENV/
+env/
 
 # Jupyter notebooks
 .ipynb_checkpoints/
 
-# macOS
+# macOS & Windows system files
 .DS_Store
+Thumbs.db
+desktop.ini
 
-# VS Code
+# IDEs
 .vscode/
+.idea/
+*.swp
+*.tmp
+*.bak
 
 # Logs
 *.log
 
-# Data artifacts
+# Data artifacts / SQLite
 *.sqlite3
 *.db
 

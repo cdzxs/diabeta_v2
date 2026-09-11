@@ -1,0 +1,134 @@
+======================================================================
+DIA BETA V2 - STAGE 1 V2 CANDIDATE BEHAVIORAL VALIDATION
+======================================================================
+
+======================================================================
+PART 1 - ARTIFACT VERIFICATION
+======================================================================
+1. Loaded: stage1_v2_candidate.pkl -> OK
+2. Is sklearn Pipeline: True
+3. Final estimator: HistGradientBoostingClassifier
+   max_iter: 300
+   max_leaf_nodes: 15
+   min_samples_leaf: 40
+   l2_regularization: 1.0
+   random_state: 42
+4. Preprocessing:
+   [num] columns=['age', 'bmi']  steps: impute
+   [cat] columns=['sex', 'race_ethnicity', 'family_history', 'hypertension', 'physical_activity', 'smoking_status']  steps: impute -> onehot
+5. Expected predictor columns (feature_names_in_): ['age', 'sex', 'bmi', 'race_ethnicity', 'family_history', 'hypertension', 'physical_activity', 'smoking_status']
+   Exactly the 8 locked predictors: True
+6. Forbidden predictors present (HbA1c/glucose/diq010/SEQN/cycle): NONE
+
+======================================================================
+PART 2 - PREDICTION BEHAVIOR (synthetic profiles)
+======================================================================
+
+  A. CLEAR LOW-RISK PROFILES
+  id   age sex  bmi race  fh htn  pa smk      pred   P(Low)   P(Mod)  P(High)
+  A1    20   1   20    1   0   0   1   0       Low    0.913    0.071    0.016
+  A2    25   2   22    2   0   0   1   0       Low    0.930    0.064    0.006
+  A3    30   1   24    3   0   0   1   0       Low    0.806    0.186    0.008
+
+  B. MODERATE/INTERMEDIATE PROFILES
+  id   age sex  bmi race  fh htn  pa smk      pred   P(Low)   P(Mod)  P(High)
+  B1    40   1   28    1   1   0   1   0  Moderate    0.416    0.440    0.144
+  B2    50   1   30    1   1   1   1   0      High    0.187    0.276    0.537
+  B3    55   1   32    1   0   1   1   0  Moderate    0.318    0.472    0.209
+  B4    45   1   31    1   1   1   1   0      High    0.259    0.320    0.421
+
+  C. CLEAR HIGH-RISK PROFILES
+  id   age sex  bmi race  fh htn  pa smk      pred   P(Low)   P(Mod)  P(High)
+  C1    60   1   35    1   1   1   1   0      High    0.097    0.268    0.635
+  C2    65   1   40    1   1   1   1   0      High    0.081    0.280    0.639
+  C3    70   1   42    1   1   1   1   0      High    0.096    0.204    0.700
+  C4    75   1   45    1   1   1   1   0      High    0.082    0.178    0.740
+
+  D. COMBINATION PROFILES
+  id   age sex  bmi race  fh htn  pa smk      pred   P(Low)   P(Mod)  P(High)
+  D1 female/race4/smoke2  58   2   33    4   1   1   1   2  Moderate    0.229    0.456    0.315
+  D2 female/race6/smoke0  48   2   29    6   1   0   1   0  Moderate    0.361    0.408    0.231
+  D3 male/race7/pa0  52   1   31    7   0   1   0   0  Moderate    0.307    0.486    0.207
+  D4 male/race2/pa0/smoke1  44   1   27    2   1   0   0   1       Low    0.472    0.388    0.140
+  D5 female/race3/smoke1  62   2   36    3   1   1   1   1      High    0.226    0.344    0.430
+  D6 male/race1/pa0/smoke2  38   1   26    1   0   0   0   2       Low    0.624    0.316    0.060
+
+======================================================================
+PART 3 - STRESS TEST GRID
+======================================================================
+  Grid size: 224 (age x BMI x family_history x hypertension)
+    Low: 104 (46.4%)
+    Moderate: 48 (21.4%)
+    High: 72 (32.1%)
+
+  HIGH-RISK SUBSET (age>=60 & bmi>=35 & fh=1 & htn=1):
+    profiles: 9
+    predicted Low: 0  Moderate: 0  High: 9
+    P(High): min=0.627  max=0.755  mean=0.682
+
+  LOW-RISK SUBSET (age<=30 & bmi<=25 & fh=0 & htn=0):
+    profiles: 6
+    predicted Low: 6  Moderate: 0  High: 0
+    P(High): min=0.009  max=0.015  mean=0.011
+
+======================================================================
+PART 4 - TREND CHECKS (observed direction, no monotonic constraint)
+======================================================================
+  Age trend (bmi=30, fh=1, htn=1, male, race1, pa=1, smoke=0):
+    age  20: P(High)=0.042
+    age  30: P(High)=0.044
+    age  40: P(High)=0.204
+    age  50: P(High)=0.537
+    age  60: P(High)=0.566
+    age  70: P(High)=0.614
+    age  80: P(High)=0.671
+    -> generally increasing: True (start=0.042, end=0.671)
+  BMI trend (age=60, fh=1, htn=1, male, race1, pa=1, smoke=0):
+    bmi  18: P(High)=0.424
+    bmi  22: P(High)=0.568
+    bmi  25: P(High)=0.588
+    bmi  28: P(High)=0.615
+    bmi  30: P(High)=0.566
+    bmi  35: P(High)=0.635
+    bmi  40: P(High)=0.627
+    bmi  45: P(High)=0.665
+    -> generally increasing: True (start=0.424, end=0.665)
+  Family-history trend (mean P(High) over the full grid):
+    fh=1: 0.349   fh=0: 0.177   -> higher risk with FH: True
+  Hypertension trend (mean P(High) over the full grid):
+    htn=1: 0.315   htn=0: 0.210   -> higher risk with HTN: True
+
+======================================================================
+PART 5 - OLD MODEL (Model 1B) vs NEW CANDIDATE
+======================================================================
+  Old model pipeline: Pipeline -> RandomForestClassifier | features: ['age', 'bmi', 'sex', 'race_ethnicity', 'family_history']
+
+  id                          new pred  old pred  new P(High)  old P(High)
+  A1                               Low       Low       0.0163       0.0100
+  A2                               Low       Low       0.0062       0.0033
+  A3                               Low       Low       0.0083       0.0000
+  B1                          Moderate       Low       0.1440       0.0033
+  B2                              High       Low       0.5372       0.0000
+  B3                          Moderate       Low       0.2094       0.4800
+  B4                              High       Low       0.4215       0.0000
+  C1                              High       Low       0.6354       0.0100
+  C2                              High       Low       0.6390       0.0067
+  C3                              High       Low       0.7001       0.0067
+  C4                              High       Low       0.7400       0.0067
+  P1 high-risk                    High       Low       0.5617       0.0000
+  P2 high-risk                    High       Low       0.5833       0.0033
+
+  Focus on the two previously problematic profiles (high-risk combinations):
+    P1 high-risk: new=High P(High)=0.5617 | old=Low P(High)=0.0000 -> candidate risk signal much stronger
+    P2 high-risk: new=High P(High)=0.5833 | old=Low P(High)=0.0033 -> candidate risk signal much stronger
+
+======================================================================
+PART 6 - VALIDATION DECISION
+======================================================================
+  All three classes produced across grid: True
+  High-risk subset not universally Low: True
+  Mean P(High) separation high-risk vs low-risk: +0.671
+  Sensible trend directions: True
+  Encoding/pipeline clean + exact 8-predictor interface: True
+
+  FINAL DECISION: PASS
