@@ -208,13 +208,11 @@
 
             <!-- DESKTOP NAVIGATION -->
             <nav class="top-nav" aria-label="Main navigation">
-                <a href="stage1.html">Stage 1 Screener</a>
-                <a href="stage2.html">Stage 2 Risk</a>
-                <a href="stage3.html" class="active" style="font-weight: 700; color: #0e2f56;">Stage 3 Time-Based</a>
-                <a href="records.html">Records</a>
-                <a href="about.html">About</a>
-                <a href="about_me.html">About Me</a>
-                <span class="assessment-pill">Stage 3</span>
+                <a href="index.html">Home</a>
+                <a href="stage1.html">Screener</a>
+                <a href="stage2.html">Assessment</a>
+                <a href="stage3.html" class="active">Prediction</a>
+                <a class="nav-cta" href="records.html">Save Report</a>
             </nav>
         </header>
 
@@ -223,17 +221,20 @@
         <aside class="side-drawer" aria-hidden="true">
             <button class="drawer-close" type="button" aria-label="Close navigation menu" data-drawer-close>&times;</button>
             <nav class="drawer-nav" aria-label="Mobile navigation">
-                <a href="stage1.html">Stage 1 Screener</a>
-                <a href="stage2.html">Stage 2 Risk</a>
-                <a href="stage3.html">Stage 3 Time-Based</a>
-                <a href="records.html">Records</a>
-                <a href="about.html">About</a>
-                <a href="about_me.html">About Me</a>
+                <a href="index.html">Home</a>
+                <a href="stage1.html">Screener</a>
+                <a href="stage2.html">Assessment</a>
+                <a href="stage3.html">Prediction</a>
+                <a href="records.html">Save Report</a>
             </nav>
         </aside>
 
         <!-- MAIN CONTAINER -->
         <main class="stage3-container">
+
+            <nav class="flow-breadcrumb" aria-label="Assessment progress">
+                <a href="stage1.html">Stage 1</a><span>&rsaquo;</span><a href="stage2.html">Stage 2</a><span>&rsaquo;</span><a class="current" href="stage3.html">Stage 3: Prediction</a>
+            </nav>
 
             <header class="section-heading" style="margin-bottom: 28px;">
                 <span class="stage3-badge">Stage 3 — Time-Based Risk</span>
@@ -368,6 +369,20 @@
                 </div>
 
             </section>
+
+            <div class="stage3-recommendation-layout">
+                <div class="recommendation-image-panel">
+                    <img class="recommendation-image" src="physician-analytics.jpg" alt="Physician reviewing a clinical analytics dashboard">
+                </div>
+                <aside class="stage3-side-panel" aria-label="Recommended actions">
+                <h2><span aria-hidden="true">&#9889;</span> Recommended Actions</h2>
+                <div class="action-card"><strong>Increase Physical Activity</strong><span>Aim for 150 min/week of moderate activity.</span></div>
+                <div class="action-card"><strong>Dietary Adjustment</strong><span>Reduce refined carbohydrate intake to stabilize HbA1c.</span></div>
+                <div class="action-card"><strong>Physician Consultation</strong><span>Discuss these results with your GP within 3 months.</span></div>
+                <button class="primary-action" type="button" data-download-current>Download PDF Report</button>
+                <div class="data-note"><strong>Your data is yours.</strong><span>This report is generated locally and stays on your device.</span></div>
+                </aside>
+            </div>
 
         </main>
     </div>

@@ -221,13 +221,11 @@
 
             <!-- DESKTOP NAVIGATION -->
             <nav class="top-nav" aria-label="Main navigation">
-                <a href="stage1.html">Stage 1 Screener</a>
-                <a href="stage2.html" class="active" style="font-weight: 700; color: #0e2f56;">Stage 2 Risk</a>
-                <a href="stage3.html">Stage 3 Time-Based</a>
-                <a href="records.html">Records</a>
-                <a href="about.html">About</a>
-                <a href="about_me.html">About Me</a>
-                <span class="assessment-pill">Hybrid Assessment</span>
+                <a href="index.html">Home</a>
+                <a href="stage1.html">Screener</a>
+                <a href="stage2.html" class="active">Assessment</a>
+                <a href="about.html">Resources</a>
+                <a class="nav-cta" href="about_me.html">Contact Support</a>
             </nav>
         </header>
 
@@ -236,17 +234,20 @@
         <aside class="side-drawer" aria-hidden="true">
             <button class="drawer-close" type="button" aria-label="Close navigation menu" data-drawer-close>&times;</button>
             <nav class="drawer-nav" aria-label="Mobile navigation">
-                <a href="stage1.html">Stage 1 Screener</a>
-                <a href="stage2.html">Stage 2 Risk</a>
-                <a href="stage3.html">Stage 3 Time-Based</a>
-                <a href="records.html">Records</a>
-                <a href="about.html">About</a>
-                <a href="about_me.html">About Me</a>
+                <a href="index.html">Home</a>
+                <a href="stage1.html">Screener</a>
+                <a href="stage2.html">Assessment</a>
+                <a href="about.html">Resources</a>
+                <a href="about_me.html">Contact Support</a>
             </nav>
         </aside>
 
         <!-- MAIN CONTENT CONTAINER -->
         <main class="stage2-container">
+
+            <nav class="flow-breadcrumb" aria-label="Assessment progress">
+                <a href="stage1.html">Stage 1</a><span>&rsaquo;</span><a class="current" href="stage2.html">Stage 2: Clinical Assessment</a><span>&rsaquo;</span><a href="stage3.html">Stage 3: Prediction</a>
+            </nav>
 
             <!-- STAGE 2 HERO / HEADER -->
             <header class="section-heading" style="margin-bottom: 28px;">
@@ -496,6 +497,14 @@
                     <p id="stage2FormError" style="color: #d64554; margin-top: 12px; display: none; font-weight: 600;"></p>
                 </form>
             </section>
+
+            <aside class="stage2-context" aria-label="Clinical context">
+                <span class="context-kicker">Clinical context</span>
+                <h2>Why we ask for clinical data</h2>
+                <p>While Stage 1 looks at lifestyle, Stage 2 uses biological markers to refine your risk assessment. This data is essential for identifying metabolic shifts that might not be visible yet.</p>
+                <div class="context-item"><span aria-hidden="true">&#9670;</span><div><strong>Blood Sugar Stability</strong><p>Fasting glucose and HbA1c help track how your body manages glucose over time.</p></div></div>
+                <div class="context-item"><span aria-hidden="true">&#9825;</span><div><strong>Cardiovascular Link</strong><p>Blood pressure and metabolic factors are closely linked to insulin resistance and overall risk.</p></div></div>
+            </aside>
 
             <!-- STAGE 2 RESULT SECTION (Hidden until submission) -->
             <section class="stage2-result-card" id="stage2ResultCard" style="display: none;">

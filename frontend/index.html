@@ -138,13 +138,9 @@
 
             <!-- DESKTOP NAVIGATION -->
             <nav class="top-nav" aria-label="Main navigation">
-                <a href="stage1.html">Stage 1 Screener</a>
-                <a href="stage2.html">Stage 2 Risk</a>
-                <a href="stage3.html">Stage 3 Time-Based</a>
-                <a href="records.html">Records</a>
-                <a href="about.html">About</a>
-                <a href="about_me.html">About Me</a>
-                <span class="assessment-pill">Clinical decision support</span>
+                <a href="#workflow">How it works</a>
+                <a href="#privacy">Privacy</a>
+                <a class="nav-cta" href="stage1.html">Begin Assessment</a>
             </nav>
 
         </header>
@@ -155,68 +151,64 @@
         <aside class="side-drawer" aria-hidden="true">
             <button class="drawer-close" type="button" aria-label="Close navigation menu" data-drawer-close>&times;</button>
             <nav class="drawer-nav" aria-label="Mobile navigation">
-                <a href="stage1.html">Stage 1 Screener</a>
-                <a href="stage2.html">Stage 2 Risk</a>
-                <a href="stage3.html">Stage 3 Time-Based</a>
-                <a href="records.html">Records</a>
-                <a href="about.html">About</a>
-                <a href="about_me.html">About Me</a>
+                <a href="#workflow">How it works</a>
+                <a href="#privacy">Privacy</a>
+                <a href="stage1.html">Begin Assessment</a>
             </nav>
         </aside>
 
         <!-- HOME HERO -->
-        <section class="info-hero image-backed-hero">
+        <section class="info-hero image-backed-hero home-hero">
             <div>
-                <p class="eyebrow">DiaBeta — clinical decision support</p>
-                <h1>Diabetes risk assessment, stage by stage.</h1>
+                <p class="eyebrow">Clinical decision support</p>
+                <h1>Assess diabetes risk with precision and clarity.</h1>
                 <p>
-                    DiaBeta assists healthcare professionals in evaluating a patient's
-                    risk of diabetes using clinical parameters and machine learning.
-                    It brings a screener, a detailed risk assessment, and time-based
-                    projections together in one connected flow.
+                    A structured, three-stage evaluation tool that helps healthcare
+                    professionals identify, quantify, and forecast diabetes risk in minutes.
                 </p>
                 <a class="primary-link" href="stage1.html">
-                    Take Assessment
+                    Begin Assessment <span aria-hidden="true">&rarr;</span>
                 </a>
+            </div>
+            <div class="home-hero-image">
+                <img src="clinical-ai-hero.png" alt="Clinical AI dashboard in a healthcare setting">
             </div>
         </section>
 
         <!-- STAGE OVERVIEW -->
-        <section class="home-stages" aria-label="The three DiaBeta assessment stages">
+        <section class="home-stages" id="workflow" aria-label="The three DiaBeta assessment stages">
+
+            <header class="home-section-heading">
+                <h2>Three stages of assessment</h2>
+                <p>DiaBeta guides clinicians through a progressive evaluation from rapid screening to time-based prediction.</p>
+            </header>
 
             <article class="home-stage-card">
-                <p class="eyebrow" style="margin: 0;">Stage 1</p>
-                <h2>Screener</h2>
+                <span class="stage-icon stage-icon-filter" aria-hidden="true">&darr;</span>
+                <h2>Stage 1 — Screener</h2>
                 <p>
-                    A quick screen from patient demographics, BMI, and key clinical and
-                    lifestyle history — no laboratory values needed. Provides an initial
-                    low, moderate, or high risk estimate.
+                    Rapid identification of patients who may benefit from further evaluation based on basic demographic and lifestyle factors.
                 </p>
-                <a class="stage-go" href="stage1.html">Begin the screener &rarr;</a>
+                <a class="stage-go" href="stage1.html">Begin the screener <span aria-hidden="true">&rsaquo;</span></a>
             </article>
 
             <article class="home-stage-card stage-gold">
-                <p class="eyebrow" style="margin: 0;">Stage 2</p>
-                <h2>Risk Assessment</h2>
+                <span class="stage-icon stage-icon-chart" aria-hidden="true">&equiv;</span>
+                <h2>Stage 2 — Risk Assessment</h2>
                 <p>
-                    A complete, higher-level assessment: enter patient information,
-                    clinical history, and at least one laboratory value (HbA1c or
-                    fasting glucose) for a detailed current risk assessment through
-                    clinical rules supported by machine learning. Start here directly,
-                    or continue from the Stage 1 screener to carry your answers
-                    forward.
+                    A complete, higher-level assessment incorporating clinical history and lab values for a detailed current risk assessment.
                 </p>
-                <a class="stage-go" href="stage2.html">Go to Stage 2 &rarr;</a>
+                <a class="stage-go" href="stage2.html">Go to Stage 2 <span aria-hidden="true">&rsaquo;</span></a>
             </article>
 
             <article class="home-stage-card">
-                <p class="eyebrow" style="margin: 0;">Stage 3</p>
-                <h2>Prediction Over Time</h2>
+                <span class="stage-icon stage-icon-time" aria-hidden="true">&olarr;</span>
+                <h2>Stage 3 — Prediction</h2>
                 <p>
                     Projects the assessed profile across 1-year and 2-year
                     perspectives to support earlier, forward-looking clinical review.
                 </p>
-                <a class="stage-go" href="stage3.html">Go to Stage 3 &rarr;</a>
+                <a class="stage-go" href="stage3.html">Go to Stage 3 <span aria-hidden="true">&rsaquo;</span></a>
             </article>
 
         </section>
@@ -234,6 +226,33 @@
                 Take Assessment
             </a>
         </section>
+
+        <section class="home-workflow" id="privacy" aria-label="DiaBeta workflow and privacy">
+            <div class="home-workflow-image">
+                <img src="care-team.jpg" alt="Healthcare professional reviewing patient information">
+            </div>
+            <div class="home-workflow-copy">
+                <p class="eyebrow">Built for real-world clinical workflows</p>
+                <h2>Clearer decisions, from screening to prediction.</h2>
+                <p>DiaBeta integrates into consultations, providing evidence-based risk stratification without disrupting existing practice.</p>
+                <ul>
+                    <li>Guideline-aligned scoring with transparent inputs.</li>
+                    <li>Actionable outputs for the next stage of review.</li>
+                    <li>Transparent methodology with explainable inputs at every stage.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="home-privacy-band">
+            <span class="privacy-mark" aria-hidden="true">&#9829;</span>
+            <h2>Your data stays with you</h2>
+            <p>All assessments run locally. Patient information is not transmitted to external servers.</p>
+        </section>
+
+        <footer class="home-footer">
+            <span>&copy; 2026 DiaBeta. For clinical decision support only.</span>
+            <nav aria-label="Footer navigation"><a href="#workflow">Methodology</a><a href="about.html">About</a><a href="records.html">Records</a></nav>
+        </footer>
 
     </main>
 
