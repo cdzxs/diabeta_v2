@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Result - DiaBeta</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Playfair+Display:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 
     <style>
@@ -106,7 +105,7 @@
     <main class="result-shell">
         <header class="result-header">
             <a class="brand-mark" href="index.html" aria-label="DiaBeta home">
-                <img src="diabeta-logo.png" alt="DiaBeta logo">
+                <img src="publication-mark.svg" alt="DiaBeta logo">
                 <span>DiaBeta</span>
             </a>
             <button class="nav-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" data-drawer-toggle>
@@ -181,11 +180,11 @@
                 <span class="continue-sub">Prediction Over Time</span>
                 <h2 class="continue-title">Continue to Stage 3</h2>
                 <p>
-                    Go directly to the time-based projections and see 1-year and
-                    2-year diabetes transition perspectives from this screener result.
+                    Estimate approximately 3-year diabetes risk after an eligible
+                    Stage 2 assessment with a valid fasting plasma glucose result.
                 </p>
-                <a href="stage3.html" class="continue-link continue-link-stage3" id="continueStage3Btn">
-                    Continue to Stage 3 &rarr;
+                <a href="stage2.html" class="continue-link continue-link-stage3" id="continueStage3Btn">
+                    Complete Stage 2 for Stage 3 &rarr;
                 </a>
             </div>
 
@@ -205,8 +204,8 @@
             <!-- Clinical Rule (shown only when reason exists) -->
             <div class="result-card" id="reasonCard" style="display:none;">
                 <div class="section-heading">
-                    <h2>Clinical Rule</h2>
-                    <p>This result was triggered by a lab value threshold.</p>
+                    <h2>Screening explanation</h2>
+                    <p>This research prototype uses eight non-laboratory predictors. It does not diagnose diabetes and has not been clinically validated for Nigerian patients.</p>
                 </div>
                 <ul class="reason-list" id="reasonList"></ul>
             </div>
@@ -232,14 +231,24 @@
     
     <script src="gauge.js"></script>
     <script>
-        // Load result from localStorage
+        (function () {
+        // Only a completed Stage 1 snapshot may be shown as a Stage 1 result.
         const stored = localStorage.getItem('diabeta_last_result');
-        if (!stored) {
-            window.location.href = 'stage1.html';
+        let result;
+        try { result = JSON.parse(stored); } catch (_) {}
+        if (!result || !result.tier || typeof result.probability !== 'number') {
+            window.location.href = result?.fromDirectStage2 ? 'stage2.html' : 'stage1.html';
+            return;
         }
-
-        const result = JSON.parse(stored);
         window.DIABETA_RESULT = result;
+        const escape = value => String(value ?? '').replace(/[&<>"']/g,
+            char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+        window.addEventListener('pageshow', () => {
+            if (localStorage.getItem('diabeta_last_result') !== stored) window.location.reload();
+        });
+        window.addEventListener('storage', event => {
+            if (!event.key || event.key === 'diabeta_last_result') window.location.reload();
+        });
 
         // Fill basic values
         const tier = result.tier || '–';
@@ -292,8 +301,8 @@
                 if ((label === 'HbA1c' || label === 'Fasting Glucose') && value === 'Not provided') return;
                 const div = document.createElement('div');
                 div.innerHTML = `
-                    <dt>${label}</dt>
-                    <dd>${value}</dd>
+                    <dt>${escape(label)}</dt>
+                    <dd>${escape(value)}</dd>
                 `;
                 inputList.appendChild(div);
             });
@@ -321,6 +330,7 @@
         }
         document.getElementById("resultNewAssessmentBtn")?.addEventListener("click", handleStartNewAssessment);
         document.getElementById("drawerNewAssessmentBtn")?.addEventListener("click", handleStartNewAssessment);
+        })();
     </script>
     <script src="app.js"></script>
 </body>

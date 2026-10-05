@@ -5,11 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stage 1: Diabetes Risk Screener — DiaBeta</title>
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Playfair+Display:wght@400;600;700;800;900&display=swap"
-        rel="stylesheet"
-    >
-
     <link rel="stylesheet" href="style.css">
 
     <style>
@@ -114,7 +109,7 @@
 
             <img
                 class="cold-start-logo"
-                src="diabeta-logo.png"
+                src="publication-mark.svg"
                 alt="DiaBeta"
             >
 
@@ -170,7 +165,7 @@
                 href="index.html"
                 aria-label="DiaBeta home"
             >
-                <img src="diabeta-logo.png" alt="DiaBeta logo">
+                <img src="publication-mark.svg" alt="DiaBeta logo">
                 <span>DiaBeta</span>
             </a>
 
@@ -524,7 +519,7 @@
                 <h2>Your health, understood</h2>
                 <p>We combine your lifestyle answers with clinical guidelines to give you a clear, actionable picture of your diabetes risk before symptoms appear.</p>
                 <div class="rail-stat"><strong>Takes ~2 minutes</strong><span>Quick, focused questions</span></div>
-                <div class="rail-stat"><strong>100% private</strong><span>No accounts, no uploads</span></div>
+                <div class="rail-stat"><strong>No account needed</strong><span>Calculations send inputs to the configured backend</span></div>
             </aside>
 
         </div>
@@ -560,7 +555,9 @@
            here.
         ============================================================ */
 
+        let assessmentRevision = 0;
         function clearTemporaryAssessmentState() {
+            assessmentRevision++;
             try {
                 localStorage.removeItem("diabeta_last_result");
                 localStorage.removeItem("diabeta_stage2_hybrid_result");
@@ -823,6 +820,7 @@
                 const bmiInput = document.querySelector('input[name="bmi"]');
                 if (bmiInput) {
                     bmiInput.value = bmi;
+                    bmiInput.dispatchEvent(new Event('input', { bubbles: true }));
                 }
 
             });
@@ -867,6 +865,8 @@
 
                 try {
 
+                    const submittedRevision = assessmentRevision;
+                    const submittedDraft = localStorage.getItem("diabeta_current_assessment");
                     const response = await fetch(`${BACKEND_URL}/api/predict`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -881,6 +881,10 @@
                     }
 
                     const result = await response.json();
+                    if (submittedRevision !== assessmentRevision ||
+                        submittedDraft !== localStorage.getItem("diabeta_current_assessment")) {
+                        throw new Error("Assessment inputs changed. Run the screener again.");
+                    }
 
                     /* ================================================
                        STORE LAST RESULT
@@ -894,15 +898,16 @@
                         probability: result.prob_high,
                         person: result.person,
                         reason: result.reason,
-                        shap: result.shap_explanation
+                        shap: result.shap_explanation,
+                        raw_inputs: payload
 
                     };
 
+                    localStorage.removeItem("diabeta_stage2_hybrid_result");
+                    localStorage.removeItem("diabeta_stage3_result");
                     localStorage.setItem("diabeta_last_result", JSON.stringify(fullResult));
                     try {
-                        const existingDraft = JSON.parse(localStorage.getItem("diabeta_current_assessment") || "{}");
                         localStorage.setItem("diabeta_current_assessment", JSON.stringify({
-                            ...existingDraft,
                             ...payload,
                             stage1_completed: true
                         }));
@@ -963,6 +968,7 @@
 
             function saveCurrentDraft() {
                 if (!form) return;
+                assessmentRevision++;
                 try {
                     const formData = new FormData(form);
                     const current = {
@@ -977,15 +983,18 @@
                         physical_activity: formData.get("physical_activity") || "",
                         smoking_status: formData.get("smoking_status") || ""
                     };
-                    const existingDraft = JSON.parse(localStorage.getItem("diabeta_current_assessment") || "{}");
-                    if (existingDraft.hba1c) current.hba1c = existingDraft.hba1c;
-                    if (existingDraft.fasting_glucose) current.fasting_glucose = existingDraft.fasting_glucose;
+                    localStorage.removeItem("diabeta_last_result");
+                    localStorage.removeItem("diabeta_stage2_hybrid_result");
+                    localStorage.removeItem("diabeta_stage3_result");
                     localStorage.setItem("diabeta_current_assessment", JSON.stringify(current));
                 } catch (_) {}
             }
 
             function populateFromCurrentAssessment() {
                 if (!form) return;
+                for (const field of form.elements) {
+                    if (field.name) field.value = '';
+                }
 
                 let person = null;
                 let s2Result = null;
@@ -1046,9 +1055,9 @@
                 if (bmiVal) form.elements["bmi"].value = bmiVal;
 
                 if (raw.sex !== undefined && raw.sex !== "") {
-                    if (raw.sex === "2" || raw.sex === "0" || String(raw.sex).toLowerCase().includes("female")) {
+                    if (["2", "0"].includes(String(raw.sex)) || String(raw.sex).toLowerCase().includes("female")) {
                         form.elements["sex"].value = "0";
-                    } else if (raw.sex === "1" || String(raw.sex).toLowerCase().includes("male")) {
+                    } else if (String(raw.sex) === "1" || String(raw.sex).toLowerCase().includes("male")) {
                         form.elements["sex"].value = "1";
                     }
                 } else if (p.Sex) {
@@ -1093,6 +1102,13 @@
 
             window.addEventListener("pageshow", () => {
                 populateFromCurrentAssessment();
+            });
+            window.addEventListener("storage", event => {
+                if (!event.key || ['diabeta_current_assessment', 'diabeta_last_result',
+                    'diabeta_stage2_hybrid_result'].includes(event.key)) {
+                    assessmentRevision++;
+                    populateFromCurrentAssessment();
+                }
             });
 
             form?.addEventListener("input", saveCurrentDraft);

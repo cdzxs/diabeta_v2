@@ -5,11 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DiaBeta — Home</title>
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Playfair+Display:wght@400;600;700;800;900&display=swap"
-        rel="stylesheet"
-    >
-
     <link rel="stylesheet" href="style.css">
 
     <style>
@@ -60,13 +55,14 @@
             grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 18px;
             margin-top: 22px;
+            padding-bottom: 64px;
         }
 
         .home-cta-band {
             background: linear-gradient(90deg, #080807, #1a1a17);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
-            margin-top: 22px;
+            margin: 0 0 64px;
             padding: 30px 32px;
             display: flex;
             align-items: center;
@@ -117,7 +113,7 @@
                 href="index.html"
                 aria-label="DiaBeta home"
             >
-                <img src="diabeta-logo.png" alt="DiaBeta logo">
+                <img src="publication-mark.svg" alt="DiaBeta logo">
                 <span>DiaBeta</span>
             </a>
 
@@ -171,7 +167,7 @@
                 </a>
             </div>
             <div class="home-hero-image">
-                <img src="clinical-ai-hero.png" alt="Clinical AI dashboard in a healthcare setting">
+                <img src="publication-illustration.svg" alt="Original geometric illustration">
             </div>
         </section>
 
@@ -205,8 +201,8 @@
                 <span class="stage-icon stage-icon-time" aria-hidden="true">&olarr;</span>
                 <h2>Stage 3 — Prediction</h2>
                 <p>
-                    Projects the assessed profile across 1-year and 2-year
-                    perspectives to support earlier, forward-looking clinical review.
+                    Estimates approximately 3-year diabetes risk after an eligible
+                    Stage 2 assessment with a valid fasting plasma glucose result.
                 </p>
                 <a class="stage-go" href="stage3.html">Go to Stage 3 <span aria-hidden="true">&rsaquo;</span></a>
             </article>
@@ -218,8 +214,8 @@
             <div>
                 <h2>Start with the Stage 1 screener.</h2>
                 <p>
-                    The assessment is private and runs in your browser — no account
-                    needed. Results and saved records stay on this device.
+                    No account is needed. Assessments are sent to the configured
+                    backend for calculation; saved records stay in this browser.
                 </p>
             </div>
             <a class="primary-link" href="stage1.html" style="padding: 15px 34px;">
@@ -229,7 +225,7 @@
 
         <section class="home-workflow" id="privacy" aria-label="DiaBeta workflow and privacy">
             <div class="home-workflow-image">
-                <img src="care-team.jpg" alt="Healthcare professional reviewing patient information">
+                <img src="publication-illustration.svg" alt="Original geometric illustration">
             </div>
             <div class="home-workflow-copy">
                 <p class="eyebrow">Built for real-world clinical workflows</p>
@@ -245,8 +241,8 @@
 
         <section class="home-privacy-band">
             <span class="privacy-mark" aria-hidden="true">&#9829;</span>
-            <h2>Your data stays with you</h2>
-            <p>All assessments run locally. Patient information is not transmitted to external servers.</p>
+            <h2>Understand where your data goes</h2>
+            <p>Saved records stay in this browser. Calculations send your assessment to the configured backend, which may be hosted. DiaBeta is a research prototype, not a diagnosis or a clinically validated Nigerian risk calculator.</p>
         </section>
 
         <footer class="home-footer">

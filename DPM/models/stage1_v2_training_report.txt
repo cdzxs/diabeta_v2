@@ -110,8 +110,8 @@ RandomForest+SMOTE          0.4778    0.4849    0.4916   0.3825   0.4294
 
 BEST MODEL (CV macro-F1): HistGradientBoosting
 
-Saved pipeline: C:\Users\samuel ucheoma\Documents\ML_Project\diabeta\diabeta\DPM\models\stage1_v2_model.pkl
-Saved test predictions: C:\Users\samuel ucheoma\Documents\ML_Project\diabeta\diabeta\DPM\models\stage1_v2_test_predictions.csv
+Saved pipeline: <local-user>\Documents\ML_Project\diabeta\diabeta\DPM\models\stage1_v2_model.pkl
+Saved test predictions: <local-user>\Documents\ML_Project\diabeta\diabeta\DPM\models\stage1_v2_test_predictions.csv
 
 ======================================================================
 FINAL SELECTED MODEL - HELD-OUT TEST PERFORMANCE

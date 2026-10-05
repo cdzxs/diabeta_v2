@@ -132,7 +132,7 @@ PART 4 - DECISION
   High recall change: -0.0261 (allowed drop <= 0.020)
 
   IMPROVED CANDIDATE FOUND: hgb_regularized
-  Saved: C:\Users\samuel ucheoma\Documents\ML_Project\diabeta\diabeta\DPM\models\stage1_v2_candidate.pkl
+  Saved: <local-user>\Documents\ML_Project\diabeta\diabeta\DPM\models\stage1_v2_candidate.pkl
 
 ======================================================================
 FINAL SUMMARY

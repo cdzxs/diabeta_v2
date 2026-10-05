@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stage 2: Risk Assessment — DiaBeta V2</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Playfair+Display:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
         .stage2-container {
@@ -205,7 +204,7 @@
         <!-- HEADER -->
         <header class="app-header">
             <a class="brand-mark" href="index.html" aria-label="DiaBeta home">
-                <img src="diabeta-logo.png" alt="DiaBeta logo">
+                <img src="publication-mark.svg" alt="DiaBeta logo">
                 <span>DiaBeta</span>
             </a>
 
@@ -467,7 +466,7 @@
                                     name="hba1c"
                                     id="stage2Hba1c"
                                     min="1"
-                                    placeholder="5.6"
+                                    placeholder="Enter measured HbA1c"
                                 >
                             </label>
 
@@ -482,7 +481,7 @@
                                     name="fasting_glucose"
                                     id="stage2Glucose"
                                     min="1"
-                                    placeholder="96"
+                                    placeholder="Enter measured fasting glucose"
                                 >
                             </label>
 
@@ -510,7 +509,7 @@
             <section class="stage2-result-card" id="stage2ResultCard" style="display: none;">
                 <div class="tier-hero">
                     <div>
-                        <span class="stage2-badge">Hybrid Assessment Output</span>
+                        <span class="stage2-badge">Final Stage 2 recommendation</span>
                         <div>
                             <span class="tier-badge" id="tierBadge">–</span>
                         </div>
@@ -521,10 +520,20 @@
 
                     <div style="text-align: right;">
                         <div class="stage2-score-number" id="riskPctNumber">–%</div>
-                        <div style="font-size: 13px; color: #607084; font-weight: 600;">ML Risk Probability of High risk</div>
+                        <div style="font-size: 13px; color: #607084; font-weight: 600;">Profile-based screening score</div>
                     </div>
                 </div>
 
+                <p>The score is the Stage 1 model's probability for its High class from profile information, not a diabetes diagnosis or future-risk percentage. Lab results do not change this score.</p>
+                <section aria-labelledby="labAssessmentTitle">
+                    <h3 id="labAssessmentTitle">Lab assessment</h3>
+                    <ul id="stage2LabAssessment"></ul>
+                </section>
+                <section aria-labelledby="finalRecommendationTitle">
+                    <h3 id="finalRecommendationTitle">Final Stage 2 recommendation</h3>
+                    <p id="stage2RuleExplanation"></p>
+                    <p><strong>Next step:</strong> <span id="stage2NextStep"></span></p>
+                </section>
                 <!-- WHY THIS RESULT -->
                 <div class="section-heading" style="margin-top: 24px;">
                     <h3 style="font-size: 18px; color: #0e2f56; margin-bottom: 8px;">Why this result</h3>
@@ -541,10 +550,10 @@
                 <!-- ACTIONS -->
                 <div class="stage2-actions">
                     <a href="stage3.html" class="primary-action" id="continueToStage3Btn" style="text-decoration: none; padding: 12px 24px; font-weight: 700; font-size: 14px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px;">
-                        Continue to Time-Based Risk &rarr;
+                        Continue to Stage 3 Future Risk &rarr;
                     </a>
                     <div id="stage3NotApplicableNotice" style="display: none; width: 100%; box-sizing: border-box; background: #fdf0ef; border: 1px solid #d64554; border-left: 4px solid #d64554; color: #8f2b23; padding: 12px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; line-height: 1.5;">
-                        High-risk Stage 2 result detected. Time-based diabetes development risk is not applicable. Please seek appropriate clinical evaluation. You can still use Start New Assessment to begin a fresh assessment.
+                        Complete the required assessment before continuing to Stage 3.
                     </div>
                     <button type="button" class="secondary-action" id="newStage2Btn">
                         Start New Assessment
@@ -560,6 +569,20 @@
 
     <!-- SCRIPT -->
     <script>
+        // Enable locally with localStorage.setItem('diabeta_debug', '1'). No identity fields are logged.
+        function traceAssessment(event, data) {
+            if (!['localhost', '127.0.0.1', ''].includes(window.location.hostname) ||
+                localStorage.getItem('diabeta_debug') !== '1') return;
+            const keys = ['age','sex','bmi','race_ethnicity','family_history','hypertension',
+                'physical_activity','smoking_status','hba1c','fasting_glucose','fasting_glucose_mgdl',
+                'hba1c_pct','Age','Sex','BMI','tier','final_risk_level','stage3_eligible',
+                'rule_triggered','model1b_probability','error'];
+            const select = value => Object.fromEntries(keys.filter(k => value && k in value).map(k => [k,value[k]]));
+            console.debug('DIABETA_TRACE ' + event, JSON.stringify({
+                ...select(data), raw_inputs: data.raw_inputs ? select(data.raw_inputs) : undefined
+            }));
+        }
+
         const BACKEND_URL = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:")
             ? "http://127.0.0.1:5000"
             : "https://diabeta-v2.onrender.com";
@@ -675,7 +698,15 @@
             }
 
             function saveCurrentDraft() {
+                // Edited fields are a draft, not the inputs behind the visible result.
+                resultCard.style.display = 'none';
+                document.getElementById('continueToStage3Btn').style.display = 'none';
+                document.getElementById('stage3NotApplicableNotice').style.display = 'none';
+                assessmentRevision++;
                 try {
+                    localStorage.removeItem('diabeta_last_result');
+                    localStorage.removeItem('diabeta_stage2_hybrid_result');
+                    localStorage.removeItem('diabeta_stage3_result');
                     const draft = {};
                     Object.keys(fieldRefs).forEach((f) => {
                         draft[f] = fieldRefs[f] ? fieldRefs[f].value : '';
@@ -694,6 +725,7 @@
             const submitBtn = document.getElementById('submitStage2Btn');
             const formError = document.getElementById('stage2FormError');
             const resultCard = document.getElementById('stage2ResultCard');
+            let assessmentRevision = 0;
             const tierBadge = document.getElementById('tierBadge');
             const tierTitle = document.getElementById('tierTitle');
             const riskNumber = document.getElementById('riskPctNumber');
@@ -713,6 +745,16 @@
                     ? Number(resData.prob_high).toFixed(1) + '%'
                     : '–';
 
+                const labList = document.getElementById('stage2LabAssessment');
+                labList.innerHTML = '';
+                for (const lab of resData.lab_assessment || []) {
+                    const item = document.createElement('li');
+                    item.textContent = lab.test + ': ' + (lab.value == null ? 'Not provided' : lab.value + ' ' + lab.unit) + '. ' + lab.finding;
+                    labList.appendChild(item);
+                }
+                if (!resData.lab_assessment) labList.textContent = 'Run Stage 2 again to see the separate lab assessment.';
+                document.getElementById('stage2RuleExplanation').textContent = resData.final_recommendation?.explanation || 'Run Stage 2 again for the rule explanation.';
+                document.getElementById('stage2NextStep').textContent = resData.final_recommendation?.next_step || 'Review this assessment with a healthcare professional.';
                 reasonList.innerHTML = '';
                 const reasons = resData.reason || [];
                 if (reasons.length === 0) {
@@ -729,12 +771,13 @@
 
                 factorsList.innerHTML = '';
                 const p = person || resData.person || {};
-                const hba1cDisplay = (resData.hba1c !== null && resData.hba1c !== undefined)
-                    ? resData.hba1c + '%'
-                    : (p.HbA1c || 'Not provided');
-                const glucoseDisplay = (resData.fasting_glucose !== null && resData.fasting_glucose !== undefined)
-                    ? resData.fasting_glucose + ' mg/dL'
-                    : (p['Fasting Glucose'] || 'Not provided');
+                // Prefer the backend's evaluated labs over duplicated summary fields.
+                const labs = resData.inputs_used || resData;
+                const labDisplay = (key, unit, fallback) => Object.hasOwn(labs, key)
+                    ? (labs[key] == null || labs[key] === '' ? 'Not provided' : labs[key] + unit)
+                    : (fallback || 'Not provided');
+                const hba1cDisplay = labDisplay('hba1c', '%', p.HbA1c);
+                const glucoseDisplay = labDisplay('fasting_glucose', ' mg/dL', p['Fasting Glucose']);
 
                 const displayMap = {
                     'Patient Name': p['Patient Name'],
@@ -752,15 +795,28 @@
                 };
                 Object.entries(displayMap).forEach(([k, v]) => {
                     const div = document.createElement('div');
-                    div.innerHTML = `<dt>${k}</dt><dd>${v !== undefined && v !== null && v !== '' ? v : 'Not provided'}</dd>`;
+                    const escape = value => String(value ?? 'Not provided').replace(/[&<>"']/g,
+                        char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+                    div.innerHTML = `<dt>${escape(k)}</dt><dd>${escape(v !== '' ? v : 'Not provided')}</dd>`;
                     factorsList.appendChild(div);
                 });
 
                 const continueBtn = document.getElementById('continueToStage3Btn');
                 const stage3NaNotice = document.getElementById('stage3NotApplicableNotice');
-                if (resData.stage3_eligible === false || tier === 'High') {
+                if (resData.stage3_eligible !== true ||
+                    [resData.final_risk_level, resData.tier].some(value => String(value).toLowerCase() === 'high')) {
                     if (continueBtn) continueBtn.style.display = 'none';
-                    if (stage3NaNotice) stage3NaNotice.style.display = 'block';
+                    if (stage3NaNotice) {
+                        const high = [resData.final_risk_level, resData.tier]
+                            .some(value => String(value).toLowerCase() === 'high');
+                        const glucose = resData.inputs_used?.fasting_glucose ?? resData.fasting_glucose;
+                        stage3NaNotice.textContent = high
+                            ? 'High-risk Stage 2 result detected. Stage 3 is unavailable. Please seek clinical evaluation.'
+                            : (glucose == null || glucose === '' || !Number.isFinite(Number(glucose)) || Number(glucose) <= 0)
+                                ? 'A fasting glucose result is required for Stage 3. Enter your measured fasting glucose and run Stage 2 again.'
+                                : 'Stage 3 is unavailable for this assessment. Review the assessment inputs and clinical guidance.';
+                        stage3NaNotice.style.display = 'block';
+                    }
                 } else {
                     if (continueBtn) continueBtn.style.display = '';
                     if (stage3NaNotice) stage3NaNotice.style.display = 'none';
@@ -770,6 +826,13 @@
             }
 
             function populateFormFromCurrentAssessment() {
+                Object.values(fieldRefs).forEach(field => { if (field) field.value = ''; });
+                const sexCode = value => {
+                    const code = String(value ?? '').trim().toLowerCase();
+                    if (['0', '0.0', '2', '2.0', 'female', 'f'].includes(code)) return '2';
+                    if (['1', '1.0', 'male', 'm'].includes(code)) return '1';
+                    return '';
+                };
                 let s2Result = null;
                 try {
                     const raw = localStorage.getItem('diabeta_stage2_hybrid_result');
@@ -802,7 +865,7 @@
                     if (p.Age) ageInput.value = p.Age;
                     else if (raw.age) ageInput.value = raw.age;
 
-                    if (raw.sex) sexSelect.value = raw.sex;
+                    if (sexCode(raw.sex)) sexSelect.value = sexCode(raw.sex);
                     else if (p.Sex) {
                         const sLower = String(p.Sex).toLowerCase();
                         sexSelect.value = (sLower.includes('male') && !sLower.includes('female')) || sLower === '1' ? '1' : '2';
@@ -866,7 +929,7 @@
                     if (p.Age) ageInput.value = p.Age;
                     else if (raw.age) ageInput.value = raw.age;
 
-                    if (raw.sex) sexSelect.value = raw.sex;
+                    if (sexCode(raw.sex)) sexSelect.value = sexCode(raw.sex);
                     else if (p.Sex) {
                         const sLower = String(p.Sex).toLowerCase();
                         sexSelect.value = (sLower.includes('male') && !sLower.includes('female')) || sLower === '1' ? '1' : '2';
@@ -923,7 +986,7 @@
                     if (draft.patient_name) nameInput.value = draft.patient_name;
                     if (draft.patient_address) addressInput.value = draft.patient_address;
                     if (draft.age) ageInput.value = draft.age;
-                    if (draft.sex) sexSelect.value = draft.sex;
+                    if (sexCode(draft.sex)) sexSelect.value = sexCode(draft.sex);
                     if (draft.bmi) bmiInput.value = draft.bmi;
                     loadRaceMap().then(() => {
                         if (draft.race_ethnicity) raceSelect.value = draft.race_ethnicity;
@@ -951,6 +1014,13 @@
             window.addEventListener('pageshow', () => {
                 populateFormFromCurrentAssessment();
             });
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'diabeta_stage2_hybrid_result' || event.key === FORM_STATE_KEY || event.key === null) {
+                    // Another tab replaced the assessment used by Continue.
+                    resultCard.style.display = 'none';
+                    populateFormFromCurrentAssessment();
+                }
+            });
 
             // Mirror every edit so the current assessment survives navigation
             form.addEventListener('input', saveCurrentDraft);
@@ -958,9 +1028,12 @@
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                resultCard.style.display = 'none';
                 formError.style.display = 'none';
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Running Assessment…';
+                const submittedRevision = assessmentRevision;
+                const submittedDraft = localStorage.getItem(FORM_STATE_KEY);
 
                 const formData = new FormData(e.target);
                 const hba1cRaw = formData.get('hba1c');
@@ -1005,6 +1078,12 @@
                     }
 
                     const resData = await response.json();
+                    if (submittedRevision !== assessmentRevision ||
+                        submittedDraft !== localStorage.getItem(FORM_STATE_KEY)) {
+                        throw new Error('Inputs changed while the assessment was running. Run Stage 2 again.');
+                    }
+                    traceAssessment('stage2 request', payload);
+                    traceAssessment('stage2 response', resData);
                     const tier = resData.final_risk_level || resData.tier || '—';
                     const person = resData.person || {};
                     const reasons = resData.reason || [];
@@ -1012,7 +1091,7 @@
                     const hba1cStored = hba1cEntered ? Number(hba1cRaw) : null;
                     const glucoseStored = glucoseEntered ? Number(glucoseRaw) : null;
                     const ruleTriggered = resData.rule_triggered || null;
-                    const stage3Eligible = resData.stage3_eligible !== false && tier !== 'High';
+                    const stage3Eligible = resData.stage3_eligible === true && String(tier).toLowerCase() !== 'high';
 
                     const s2Record = {
                         'Patient Name': person['Patient Name'] || payload.patient_name || '',
@@ -1044,32 +1123,33 @@
                         rule_triggered: ruleTriggered,
                         stage3_eligible: stage3Eligible,
                         person: person,
-                        raw_inputs: payload
+                        raw_inputs: payload,
+                        inputs_used: resData.inputs_used,
+                        lab_assessment: resData.lab_assessment,
+                        profile_screening: resData.profile_screening,
+                        final_recommendation: resData.final_recommendation
                     };
 
                     try {
                         localStorage.setItem('diabeta_stage2_hybrid_result', JSON.stringify(s2Record));
-                        localStorage.setItem(FORM_STATE_KEY, JSON.stringify(payload));
-                    } catch (_) {}
+                        traceAssessment('stage2 saved', JSON.parse(localStorage.getItem('diabeta_stage2_hybrid_result')));
+                    } catch (_) {
+                        throw new Error('Could not save this assessment. Enable local storage and run Stage 2 again before continuing.');
+                    }
+                    try { localStorage.setItem(FORM_STATE_KEY, JSON.stringify(payload)); } catch (_) {}
 
                     // Ensure the current assessment identity and demographics carry over
                     // to Stage 1 and Stage 3 even if starting directly at Stage 2
                     try {
-                        let last = null;
-                        const rawLast = localStorage.getItem('diabeta_last_result');
-                        if (rawLast) {
-                            last = JSON.parse(rawLast);
-                        }
-                        if (!last) {
-                            last = {
+                        // Keep a navigation summary, never combine a previous
+                        // Stage 1 score with this assessment's patient details.
+                        const last = {
                                 id: Date.now().toString(),
                                 createdAt: new Date().toISOString(),
                                 fromDirectStage2: true,
-                                person: person
+                                person: person,
+                                raw_inputs: payload
                             };
-                        } else {
-                            last.person = { ...(last.person || {}), ...person };
-                        }
                         localStorage.setItem('diabeta_last_result', JSON.stringify(last));
                     } catch (_) {}
 
@@ -1097,6 +1177,7 @@
                 if (!window.confirm('Start a new assessment? The current assessment will be cleared.')) {
                     return;
                 }
+                assessmentRevision++;
                 try {
                     localStorage.removeItem('diabeta_last_result');
                     localStorage.removeItem('diabeta_stage2_hybrid_result');

@@ -48,7 +48,7 @@ body {
 
     background:
         #080807
-        url("background.jpg")
+        url("publication-illustration.svg")
         center center / cover fixed no-repeat;
 
     overflow-x: hidden;
@@ -1812,7 +1812,7 @@ select:focus {
             rgba(7, 42, 75, 0.68),
             rgba(7, 42, 75, 0.24)
         ),
-        url("health-background.jpg")
+        url("publication-illustration.svg")
         center / cover;
 
     box-shadow:
@@ -3424,7 +3424,7 @@ body {
     width: 39%;
     height: 66%;
     border-radius: 16px;
-    background: url("health-background.jpg") center / cover;
+    background: url("publication-illustration.svg") center / cover;
     box-shadow: 0 18px 40px rgba(8, 34, 62, 0.2);
 }
 
@@ -4147,7 +4147,7 @@ body {
     color: #ffffff;
     background:
         linear-gradient(145deg, rgba(22, 94, 142, 0.96), rgba(19, 83, 124, 0.94)),
-        url("care-network.jpg") center / cover;
+        url("publication-illustration.svg") center / cover;
     position: relative;
     overflow: hidden;
 }

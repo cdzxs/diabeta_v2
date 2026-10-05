@@ -37,3 +37,95 @@ desktop.ini
 
 # Ignore pipelines / caches
 .cache/
+
+# Local integration history, duplicate delivery archive and reference screenshots.
+# Preserve locally; these are not runtime inputs.
+/local_integration_backup/
+/DiaBeta_unified_Rich_3year_model_v1.zip
+/ui/
+
+# Local exports may contain personal health information.
+/assessment_exports/
+/debug_outputs/
+
+# Research experiments stay local; the active unified runtime is outside this tree.
+/stage3_model_research/
+/.venv-precommit/
+
+# Intentionally untracked local data, backups and retired artifacts.
+/DPM/assessment/hybrid_assessment_before_v2_model_swap.py
+/DPM/assessment/predict_model2.py
+/DPM/data/BMX_H.xpt
+/DPM/data/BMX_I.xpt
+/DPM/data/BMX_J.xpt
+/DPM/data/BPQ_H.xpt
+/DPM/data/BPQ_I.xpt
+/DPM/data/BPQ_J.xpt
+/DPM/data/DEMO_H.xpt
+/DPM/data/DEMO_I.xpt
+/DPM/data/DEMO_J.xpt
+/DPM/data/DIQ_H.xpt
+/DPM/data/DIQ_I.xpt
+/DPM/data/DIQ_J.xpt
+/DPM/data/GHB_H.xpt
+/DPM/data/GHB_I.xpt
+/DPM/data/GHB_J.xpt
+/DPM/data/GLU_H.xpt
+/DPM/data/GLU_I.xpt
+/DPM/data/GLU_J.xpt
+/DPM/data/MCQ_H.xpt
+/DPM/data/MCQ_I.xpt
+/DPM/data/MCQ_J.xpt
+/DPM/data/PAQ_H.xpt
+/DPM/data/PAQ_I.xpt
+/DPM/data/PAQ_J.xpt
+/DPM/data/SMQ_H.xpt
+/DPM/data/SMQ_I.xpt
+/DPM/data/SMQ_J.xpt
+/DPM/data/stage1_v2_nhanes_8predictors.csv
+/DPM/models/diabeta_dataset1_model.pkl
+/DPM/models/diabeta_dataset2_model.pkl
+/DPM/stage3/predict_risk.py
+/DPM/stage3/stage3_discrete_survival_model.json
+/DPM/stage3/stage3_discrete_survival_model.pkl
+/DPM/stage3/stage3_preprocessor.pkl
+/DPM/stage3/stage3_threshold.txt
+/DPM/stage3/stage3_xgboost_model.pkl
+/DPM/stage3_baseline_backup/predict_risk.py
+/DPM/stage3_baseline_backup/stage3_preprocessor.pkl
+/DPM/stage3_baseline_backup/stage3_threshold.txt
+/DPM/stage3_baseline_backup/stage3_xgboost_model.pkl
+/backend/model/features_nhanes_binary.pkl
+/backend/model/model_binary_nhanes.pkl
+/backend/model/scaler_nhanes_binary.pkl
+/backend/model/shap_values_binary.pkl
+/backend/model/threshold_bounds_nhanes.pkl
+/frontend/stage2_before_v2_model_swap.html
+# Do not blanket-ignore model files: active runtime and audit artifacts remain tracked.
+
+/backend/app_before_stage2_v2_model_swap.py
+
+/.precommit-check/
+
+# Future local environments, participant inputs and assessment exports.
+.venv*/
+*.xpt
+*.xlsx
+*.sqlite
+*.pem
+*.key
+*assessment*export*.json
+*assessment*export*.csv
+*patient*records*.csv
+*patient*records*.json
+# Historical audit inputs are retained locally, not runtime dependencies.
+/DPM/models/stage1_v2_baseline_before_integration.pkl
+/DPM/models/stage1_v2_test_predictions.csv
+
+# Local preservation folders and future participant-level research outputs.
+/diabeta_v2_research_archive/
+/research_archive/
+/diabeta_v2_release_removed_local/
+**/oof_predictions.csv
+**/nagala_modelling_table.csv
+**/stage3_stress_test_results.csv

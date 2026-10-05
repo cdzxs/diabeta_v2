@@ -7,6 +7,13 @@
     <title>About DiaBeta</title>
 
     <link rel="stylesheet" href="style.css">
+    <style>
+        .how-guide { max-width: 800px; margin: 40px auto; padding: 0 24px; line-height: 1.7; color: #243b53; }
+        .how-guide h1 { font-size: clamp(2rem, 5vw, 3rem); line-height: 1.2; }
+        .how-guide section { margin: 32px 0; }
+        .how-guide h2 { font-size: 1.5rem; line-height: 1.3; }
+        .how-guide h3 { font-size: 1.15rem; margin-top: 24px; }
+    </style>
 </head>
 
 <body class="about-page">
@@ -21,7 +28,7 @@
                 href="index.html"
                 aria-label="DiaBeta home"
             >
-                <img src="diabeta-logo.png" alt="DiaBeta logo">
+                <img src="publication-mark.svg" alt="DiaBeta logo">
                 <span>DiaBeta</span>
             </a>
 
@@ -109,27 +116,51 @@
         </aside>
 
 
-        <section class="about-hero-reference">
-            <div>
-                <h1>Bridging the gap in diabetes prevention.</h1>
-                <p>DiaBeta was born out of a simple mission: to make clinical-grade risk assessment accessible, transparent, and privacy-focused for everyone.</p>
-                <div class="about-experts"><img src="profile-photo.png" alt="DiaBeta contributor"><strong>Developed by experts</strong><span>Clinicians &amp; data scientists</span></div>
-            </div>
-            <div class="about-hero-image"><img src="care-team.jpg" alt="Healthcare team collaborating in a clinical setting"><span><strong>100%</strong><small>Privacy guaranteed</small></span></div>
-        </section>
+        <article class="how-guide">
+            <h1>How DiaBeta works</h1>
+            <p>DiaBeta is a research-stage tool for adults who want to understand diabetes risk and discuss prevention with a healthcare professional. It supports assessment and informed conversations; it does not diagnose diabetes or replace clinical care.</p>
+            <p>Our aim is to make risk information clearer and help people take an appropriate next step.</p>
 
-        <section class="about-principles">
-            <header><h2>Our core principles</h2><p>We believe healthcare tools should be built on three foundational pillars.</p></header>
-            <div class="info-grid">
-                <article class="info-card"><span class="principle-icon">&#10003;</span><h2>Uncompromising Privacy</h2><p>All assessments happen in your browser, and your data never leaves your device.</p></article>
-                <article class="info-card"><span class="principle-icon">&#9670;</span><h2>Evidence-Based</h2><p>Our prediction models are built upon established clinical research and metabolic indicators.</p></article>
-                <article class="info-card"><span class="principle-icon">&#9829;</span><h2>Human Centric</h2><p>We focus on turning complex clinical values into clear, actionable health insights.</p></article>
-            </div>
-        </section>
+            <section><h2>Three stages, different questions</h2>
+                <h3>Stage 1: screening without lab tests</h3>
+                <p>Answer questions about your age, sex, BMI, race or ethnicity, family history of diabetes, hypertension, physical activity and smoking. The model assigns a Low, Moderate or High screening category.</p>
+                <p>The percentage estimates how strongly your profile matches the model's High-risk class. It is not your chance of developing diabetes over a set number of years, and it does not tell you whether you have diabetes.</p>
+                <h3>Stage 2: assessment with available lab results</h3>
+                <p>Stage 2 combines those profile details with an entered HbA1c result, fasting glucose result, or both. Its final Low, Moderate or High category follows rules that consider both the profile model and the laboratory values.</p>
+                <p>The displayed ML percentage still comes from the profile information alone. Changing only HbA1c or fasting glucose can change the final category while leaving that percentage unchanged. The percentage and final category answer different questions.</p>
+                <p>Your result separates three things: the <strong>Lab assessment</strong> describes each supplied test and identifies missing tests; the <strong>Profile-based screening score</strong> is the Stage 1 model's probability for its High class; and the <strong>Final Stage 2 recommendation</strong> explains which rule won and what to do next.</p>
+                <p>A profile-driven High recommendation can occur even when supplied labs are below the prediabetes thresholds. It is a prompt for clinical review, not a diagnosis. When a laboratory threshold determines the result, that is a lab rule; the model has not discovered the threshold. An absent test cannot be described as normal.</p>
+                <h3>Stage 3: future risk for eligible people</h3>
+                <p>This separate model estimates the chance of developing diabetes within approximately three years. It uses age, sex, BMI and fasting glucose. HbA1c informs Stage 2 and eligibility, but is not a Stage 3 model predictor.</p>
+                <p>The rounded percentage is a model estimate, not a diagnosis or a certainty. Its category gives a proposed next step. It should not be compared directly with the profile-based percentages in Stages 1 and 2.</p>
+            </section>
 
-        <section class="about-quote"><blockquote>"We started DiaBeta because prevention should not be a luxury. It should be a standard."</blockquote><strong>DiaBeta Team</strong></section>
+            <section><h2>Starting with Stage 2</h2>
+                <p>You may enter Stage 2 directly without first running Stage 1. Supply the same eight profile details and at least one measured laboratory result: HbA1c or fasting glucose. Use your actual results, not example text in an empty field.</p>
+                <p>Stage 3 requires an entered fasting glucose value because it is one of that model's predictors. HbA1c alone cannot replace it. A Moderate Stage 2 result without fasting glucose may therefore be unable to continue.</p>
+                <p>Every High Stage 2 result blocks Stage 3, regardless of which rule produced it. Clinical review is the appropriate next step. The backend independently reassesses the submitted inputs before scoring; a displayed category does not override that check. Inputs outside the Stage 3 evidence limits also prevent scoring.</p>
+                <p>If you edit an assessment, run Stage 2 again so that the result describes your current inputs.</p>
+            </section>
 
-        <section class="about-contact"><div><h2>Have questions or feedback?</h2><p>We're always looking to improve our models and user experience.</p></div><a class="primary-link" href="mailto:ezejigodswill041@gmail.com">Email the Team</a><a class="secondary-action" href="about_me.html">Meet the Team</a></section>
+            <section><h2>Understanding your Stage 3 next step</h2>
+                <p><strong>Lower estimated risk:</strong> Continue prevention and follow clinical advice on repeat screening. Lower does not mean safe or free of risk.</p>
+                <p><strong>Increased risk:</strong> Discuss your risk factors and a prevention plan with a healthcare professional.</p>
+                <p><strong>Elevated risk:</strong> Arrange a clinical review to discuss prevention and follow-up.</p>
+                <p>These are proposed, project-specific action bands, not diagnostic thresholds.</p>
+            </section>
+
+            <section><h2>Research evidence and warnings</h2>
+                <p>The Stage 3 model was developed using a Chinese health-check cohort. Reported internal evaluation used held-out prediction folds, but censoring weights used the full cohort before splitting, so the evaluation was not fully isolated. This does not establish clinical accuracy in other settings. External clinical validation for Nigerian patients has not been established.</p>
+                <p>A <strong>Research estimate</strong> badge does not mean clinically validated. <strong>Use with caution</strong> means that one or more values lie in a sparsely represented part of the training cohort. Read the warning with your result and discuss it with a healthcare professional.</p>
+                <p>The horizon is approximately three years because diabetes was detected at follow-up visits rather than at an exact onset time. This model does not provide a diagnosis today or predictions for other time horizons.</p>
+            </section>
+
+            <section><h2>Your information</h2>
+                <p>The frontend saves assessment state in your browser and sends the entered assessment to the configured backend for calculation. When both run locally, that processing happens on your computer; a hosted backend receives the submitted data. Browser storage is not a guarantee of privacy. Avoid shared devices for personal health information and use Start New Assessment to clear the current assessment.</p>
+            </section>
+        </article>
+
+        <section class="about-contact"><div><h2>Have questions or feedback?</h2><p>We're always looking to improve our models and user experience.</p></div><a class="secondary-action" href="about_me.html">Meet the Team</a></section>
 
     </main>
 

@@ -1,0 +1,192 @@
+{
+  "model": "unified_rich_monotonic_hist_gradient_boosting_3y",
+  "target": "incident diabetes by approximately three years",
+  "features": [
+    "age",
+    "male",
+    "bmi",
+    "fpg_mmol_l"
+  ],
+  "cohort": {
+    "eligible_n": 211783,
+    "three_year_evaluable_n": 105740,
+    "cases_by_three_years": 1763,
+    "kaplan_meier_risk_3y": 0.011825228641399309
+  },
+  "validation": {
+    "method": "five-fold out-of-fold with IPCW for right censoring",
+    "group": "all",
+    "n_evaluable": 105740,
+    "cases": 1763,
+    "ipcw_observed_risk": 0.011825228641399309,
+    "ipcw_mean_predicted_risk": 0.011885736776171623,
+    "ipcw_auc": 0.9260644157084451,
+    "ipcw_average_precision": 0.18802159900496124,
+    "ipcw_brier": 0.010310387255022684,
+    "auc_95_ci": [
+      0.9198359591326516,
+      0.9319554293893695
+    ],
+    "brier_95_ci": [
+      0.009856561987564402,
+      0.01077088115306721
+    ],
+    "calibration_intercept_ideal_0": -0.045641082114279106,
+    "calibration_slope_ideal_1": 0.9860404830250553,
+    "subgroups": [
+      {
+        "group": "fpg_below_100",
+        "n_evaluable": 93784,
+        "cases": 397,
+        "ipcw_observed_risk": 0.0030818152479531063,
+        "ipcw_mean_predicted_risk": 0.0030625972203011205,
+        "ipcw_auc": 0.8305654446099124,
+        "ipcw_average_precision": 0.018023261064694075,
+        "ipcw_brier": 0.0030473326867734487
+      },
+      {
+        "group": "fpg_100_109",
+        "n_evaluable": 8074,
+        "cases": 387,
+        "ipcw_observed_risk": 0.034790073931057236,
+        "ipcw_mean_predicted_risk": 0.03494376325036865,
+        "ipcw_auc": 0.7105079550513526,
+        "ipcw_average_precision": 0.07854068042346732,
+        "ipcw_brier": 0.03291232880196068
+      },
+      {
+        "group": "fpg_110_125",
+        "n_evaluable": 3882,
+        "cases": 979,
+        "ipcw_observed_risk": 0.18944661031860124,
+        "ipcw_mean_predicted_risk": 0.1913851848515714,
+        "ipcw_auc": 0.625878225483591,
+        "ipcw_average_precision": 0.26070789853800214,
+        "ipcw_brier": 0.15001935705052913
+      },
+      {
+        "group": "women",
+        "n_evaluable": 46914,
+        "cases": 507,
+        "ipcw_observed_risk": 0.007690294910698577,
+        "ipcw_mean_predicted_risk": 0.007785170108051368,
+        "ipcw_auc": 0.9292300823403167,
+        "ipcw_average_precision": 0.1752074529131807,
+        "ipcw_brier": 0.006816735667342765
+      },
+      {
+        "group": "men",
+        "n_evaluable": 58826,
+        "cases": 1256,
+        "ipcw_observed_risk": 0.015133384752010601,
+        "ipcw_mean_predicted_risk": 0.015166397498589572,
+        "ipcw_auc": 0.9191319426910382,
+        "ipcw_average_precision": 0.19280224065073934,
+        "ipcw_brier": 0.013105485218097306
+      },
+      {
+        "group": "age_20_29",
+        "n_evaluable": 11417,
+        "cases": 43,
+        "ipcw_observed_risk": 0.002737402181507074,
+        "ipcw_mean_predicted_risk": 0.00240445853514429,
+        "ipcw_auc": 0.8784829824275409,
+        "ipcw_average_precision": 0.11609332212604165,
+        "ipcw_brier": 0.002589871480924715
+      },
+      {
+        "group": "age_30_49",
+        "n_evaluable": 66525,
+        "cases": 564,
+        "ipcw_observed_risk": 0.005910227003134311,
+        "ipcw_mean_predicted_risk": 0.005851956707844415,
+        "ipcw_auc": 0.9272496817538136,
+        "ipcw_average_precision": 0.1753448899067022,
+        "ipcw_brier": 0.005217777524444303
+      },
+      {
+        "group": "age_50_69",
+        "n_evaluable": 24171,
+        "cases": 901,
+        "ipcw_observed_risk": 0.026572767155185785,
+        "ipcw_mean_predicted_risk": 0.027197653395476105,
+        "ipcw_auc": 0.880130181318216,
+        "ipcw_average_precision": 0.1839889718562045,
+        "ipcw_brier": 0.02312237346430573
+      },
+      {
+        "group": "age_70_plus",
+        "n_evaluable": 3627,
+        "cases": 255,
+        "ipcw_observed_risk": 0.05218453185820716,
+        "ipcw_mean_predicted_risk": 0.05192942236306881,
+        "ipcw_auc": 0.8149568723256286,
+        "ipcw_average_precision": 0.2428883709293766,
+        "ipcw_brier": 0.043953758870116044
+      },
+      {
+        "group": "bmi_below_25",
+        "n_evaluable": 75374,
+        "cases": 652,
+        "ipcw_observed_risk": 0.006125875790265133,
+        "ipcw_mean_predicted_risk": 0.006100172181936573,
+        "ipcw_auc": 0.9272065555347064,
+        "ipcw_average_precision": 0.16577184933929084,
+        "ipcw_brier": 0.005450875384723047
+      },
+      {
+        "group": "bmi_25_29",
+        "n_evaluable": 26935,
+        "cases": 897,
+        "ipcw_observed_risk": 0.023731456556615748,
+        "ipcw_mean_predicted_risk": 0.023701132862373322,
+        "ipcw_auc": 0.8953456302753814,
+        "ipcw_average_precision": 0.21355614920040727,
+        "ipcw_brier": 0.020263181898945375
+      },
+      {
+        "group": "bmi_30_plus",
+        "n_evaluable": 3431,
+        "cases": 214,
+        "ipcw_observed_risk": 0.044767431452209926,
+        "ipcw_mean_predicted_risk": 0.047471884891575306,
+        "ipcw_auc": 0.8137171875657133,
+        "ipcw_average_precision": 0.1867100441174563,
+        "ipcw_brier": 0.039974009776983344
+      }
+    ]
+  },
+  "evidence_ranges": {
+    "age": {
+      "observed": [
+        20.0,
+        99.0
+      ],
+      "central_1_99_percent": [
+        25.0,
+        78.0
+      ]
+    },
+    "bmi": {
+      "observed": [
+        15.0,
+        52.7
+      ],
+      "central_1_99_percent": [
+        17.0,
+        32.2
+      ]
+    },
+    "fpg_mmol_l": {
+      "observed": [
+        2.8,
+        6.99
+      ],
+      "central_1_99_percent": [
+        3.45,
+        6.53
+      ]
+    }
+  },
+  "source_sha256": "ffd341a1a91ac65585b9fba70847a2681f5671a6035d9cfbf92e50795d74fbf6"
+}

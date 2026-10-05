@@ -6,6 +6,10 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import joblib
 import pandas as pd
+if __package__:
+    from .stage2_explanation import explain as explain_stage2
+else:
+    from stage2_explanation import explain as explain_stage2
 
 app = Flask(__name__)
 CORS(app)  # allow frontend (different domain) to call the API
@@ -15,19 +19,17 @@ DPM_ASSESSMENT_DIR = BASE_DIR.parent / "DPM" / "assessment"
 if str(DPM_ASSESSMENT_DIR) not in sys.path:
     sys.path.insert(0, str(DPM_ASSESSMENT_DIR))
 
-DPM_STAGE3_DIR = BASE_DIR.parent / "DPM" / "stage3"
-if str(DPM_STAGE3_DIR) not in sys.path:
-    sys.path.insert(0, str(DPM_STAGE3_DIR))
+DPM_STAGE3_UNIFIED_DIR = BASE_DIR.parent / "DPM" / "stage3" / "unified_rich_model"
+if str(DPM_STAGE3_UNIFIED_DIR) not in sys.path:
+    sys.path.insert(0, str(DPM_STAGE3_UNIFIED_DIR))
 
 import hybrid_assessment as ha
-import predict_risk as p_s3
+import inference as unified_s3
+from inference import NotApplicableError as S3NotApplicableError, OutsideEvidenceError as S3OutsideEvidenceError
 
-# Load and memoize the Stage 3 artifacts and the Stage 1 V2 screener at startup.
-# Stage 2 is the hybrid assessment layer - deterministic clinical rules over the
-# validated Stage 1 V2 screener, implemented in DPM/assessment/hybrid_assessment.py
-# (no separate Stage 2 model artifact). The old Model 1B (diabeta_dataset1_model.pkl)
-# is retired from the active Stage 2 path; it is no longer loaded here.
-stage3_prep, stage3_model, stage3_threshold = p_s3.load_artifacts()
+# Warm up / verify the unified Stage 3 Rich 3-year model at startup
+_unified_s3_model = joblib.load(unified_s3.MODEL_PATH)
+
 
 # ---- Stage 1 V2 screener (validated 8-predictor, non-laboratory model) ----
 # Active Stage 1 model: DPM/models/stage1_v2_model.pkl
@@ -92,7 +94,7 @@ def predict():
         return jsonify({"error": "Missing required field: age"}), 400
     try:
         age = float(data["age"])
-        if age <= 0 or age > 130 or math.isnan(age):
+        if isinstance(data["age"], bool) or age <= 0 or age > 130 or not math.isfinite(age):
             return jsonify({"error": "Invalid value for age: must be a positive number up to 130."}), 400
     except (ValueError, TypeError):
         return jsonify({"error": "Invalid value for age: must be a numeric value."}), 400
@@ -102,7 +104,7 @@ def predict():
         return jsonify({"error": "Missing required field: bmi"}), 400
     try:
         bmi = float(data["bmi"])
-        if bmi <= 0 or bmi > 150 or math.isnan(bmi):
+        if isinstance(data["bmi"], bool) or bmi <= 0 or bmi > 150 or not math.isfinite(bmi):
             return jsonify({"error": "Invalid value for bmi: must be a positive number."}), 400
     except (ValueError, TypeError):
         return jsonify({"error": "Invalid value for bmi: must be a numeric value."}), 400
@@ -124,8 +126,11 @@ def predict():
     if "race_ethnicity" not in data or data["race_ethnicity"] is None or str(data["race_ethnicity"]).strip() == "":
         return jsonify({"error": "Missing required field: race_ethnicity"}), 400
     try:
-        race_code = int(float(data["race_ethnicity"]))
-    except (ValueError, TypeError):
+        race_value = float(data["race_ethnicity"])
+        if isinstance(data["race_ethnicity"], bool) or race_value not in (1, 2, 3, 4, 6, 7):
+            raise ValueError("Unsupported race code")
+        race_code = int(race_value)
+    except (ValueError, TypeError, OverflowError):
         return jsonify({"error": "Invalid value for race_ethnicity: must be an integer code."}), 400
     race_label = race_map.get(race_code, race_map.get(str(race_code), f"Code {race_code}"))
 
@@ -253,22 +258,26 @@ def predict_stage2():
     family_history, hypertension, physical_activity, smoking_status), accepts
     optional patient identity fields (patient_name, patient_address - used for
     the person summary display only, never as model features), accepts
-    optional HbA1c and fasting glucose (either, both, or neither may be
-    supplied), and runs the existing hybrid assessment engine
+    HbA1c and fasting glucose (at least one must be supplied), and runs
+    the existing hybrid assessment engine
     (DPM/assessment/hybrid_assessment.py) on top of the validated Stage 1 V2
     screener.
     """
-    data = request.get_json(silent=True)
+    return assess_stage2_request(request.get_json(silent=True))
+
+
+def assess_stage2_request(data):
+    """Shared validation and server-side assessment for Stages 2 and 3."""
     if not isinstance(data, dict):
         return jsonify({"error": "Invalid request body: expected a JSON object."}), 400
 
-    # 1. Validate & parse the five Stage 1 screener inputs
+    # 1. Validate & parse the eight Stage 1 screener inputs
     # age
     if "age" not in data or data["age"] is None or str(data["age"]).strip() == "":
         return jsonify({"error": "Missing required field: age"}), 400
     try:
         age = float(data["age"])
-        if age <= 0 or age > 130 or math.isnan(age):
+        if isinstance(data["age"], bool) or age <= 0 or age > 130 or not math.isfinite(age):
             return jsonify({"error": "Invalid value for age: must be a positive number up to 130."}), 400
     except (ValueError, TypeError):
         return jsonify({"error": "Invalid value for age: must be a numeric value."}), 400
@@ -278,7 +287,7 @@ def predict_stage2():
         return jsonify({"error": "Missing required field: bmi"}), 400
     try:
         bmi = float(data["bmi"])
-        if bmi <= 0 or bmi > 150 or math.isnan(bmi):
+        if isinstance(data["bmi"], bool) or bmi <= 0 or bmi > 150 or not math.isfinite(bmi):
             return jsonify({"error": "Invalid value for bmi: must be a positive number."}), 400
     except (ValueError, TypeError):
         return jsonify({"error": "Invalid value for bmi: must be a numeric value."}), 400
@@ -300,12 +309,15 @@ def predict_stage2():
     if "race_ethnicity" not in data or data["race_ethnicity"] is None or str(data["race_ethnicity"]).strip() == "":
         return jsonify({"error": "Missing required field: race_ethnicity"}), 400
     try:
-        race_code = int(float(data["race_ethnicity"]))
-    except (ValueError, TypeError):
+        race_value = float(data["race_ethnicity"])
+        if isinstance(data["race_ethnicity"], bool) or race_value not in (1, 2, 3, 4, 6, 7):
+            raise ValueError("Unsupported race code")
+        race_code = int(race_value)
+    except (ValueError, TypeError, OverflowError):
         return jsonify({"error": "Invalid value for race_ethnicity: must be an integer code."}), 400
     race_label = race_map.get(race_code, race_map.get(str(race_code), f"Code {race_code}"))
 
-    # family_history (1 -> 1.0, 0 -> NaN, matching Stage 1 semantics)
+    # family_history (1 -> 1.0, 0 -> 0.0, unknown -> NaN)
     if "family_history" not in data or data["family_history"] is None or str(data["family_history"]).strip() == "" or str(data["family_history"]).strip().lower() == "null":
         return jsonify({"error": "Missing required field: family_history"}), 400
     raw_fam = str(data["family_history"]).strip().lower()
@@ -370,7 +382,7 @@ def predict_stage2():
     if raw_hba1c is not None and str(raw_hba1c).strip() != "" and str(raw_hba1c).strip().lower() != "null":
         try:
             hba1c = float(raw_hba1c)
-            if math.isnan(hba1c) or hba1c < 0:
+            if isinstance(raw_hba1c, bool) or not math.isfinite(hba1c) or hba1c <= 0:
                 return jsonify({"error": "Invalid value for hba1c: must be a positive number."}), 400
         except (ValueError, TypeError):
             return jsonify({"error": "Invalid value for hba1c: must be a numeric value."}), 400
@@ -381,7 +393,7 @@ def predict_stage2():
     if raw_glucose is not None and str(raw_glucose).strip() != "" and str(raw_glucose).strip().lower() != "null":
         try:
             glucose = float(raw_glucose)
-            if math.isnan(glucose) or glucose < 0:
+            if isinstance(raw_glucose, bool) or not math.isfinite(glucose) or glucose <= 0:
                 return jsonify({"error": "Invalid value for fasting glucose: must be a positive number."}), 400
         except (ValueError, TypeError):
             return jsonify({"error": "Invalid value for fasting glucose: must be a numeric value."}), 400
@@ -415,6 +427,11 @@ def predict_stage2():
         return jsonify({"error": f"Assessment execution error: {str(e)}"}), 500
 
     tier = assessment["final_risk_level"]
+    # Opt-in local diagnostics: assessment features only, never patient identity.
+    if os.environ.get("DIABETA_TRACE") == "1":
+        app.logger.warning("DIABETA_TRACE path=%s inputs=%s tier=%s rule=%s probabilities=%s",
+                           request.path, form_input, tier, assessment["rule_triggered"],
+                           assessment["model1b_probability"])
     prob_high = float(round(float(assessment["model1b_probability"].get("High", 0.0)) * 100, 1))
     rule_triggered = assessment["rule_triggered"]
 
@@ -443,7 +460,7 @@ def predict_stage2():
         if hba1c is None and glucose is None:
             reasons.append("Assessment based on the ML screener using demographic and clinical factors (no laboratory values provided).")
         else:
-            reasons.append("Laboratory values were within normal reference ranges; classification determined by the ML screener.")
+            reasons.append("No earlier rule applied to the supplied laboratory values; the profile-model fallback determined the recommendation. Missing tests were not assessed.")
     else:
         reasons.append(f"Assessment determined by the hybrid clinical rules.")
 
@@ -467,21 +484,22 @@ def predict_stage2():
         "Smoking Status": smk_label,
     }
 
-    # Stage 3 eligibility: time-based future diabetes risk is only meaningful
-    # when the Stage 2 assessment did NOT already conclude HIGH risk. ANY final
-    # HIGH result - whether from Rule 1 (diabetes-range labs), Rule 2 (screener
-    # P(High) >= 0.70), or Rule 4 (screener Low/High fallback) - blocks Stage 3.
-    # Only LOW and MODERATE Stage 2 outcomes may proceed.
-    stage3_eligible = tier in ("Low", "Moderate")
+    # Every High outcome is ineligible, regardless of which hybrid rule fired.
+    is_diabetic_lab = (hba1c is not None and hba1c >= ha.HBA1C_DIABETIC_THRESHOLD) or \
+                      (glucose is not None and glucose >= ha.GLUCOSE_DIABETIC_THRESHOLD)
+    has_fpg = bool(glucose is not None and math.isfinite(glucose) and glucose > 0)
+    stage3_eligible = bool(tier != "High" and (not is_diabetic_lab) and has_fpg)
 
     return jsonify({
         "final_risk_level": tier,
+        **explain_stage2(assessment, hba1c, glucose),
         "tier": tier,
         "prob_high": prob_high,
         "model1b_prediction": assessment["model1b_prediction"],
         "model1b_probability": assessment["model1b_probability"],
         "rule_triggered": rule_triggered,
         "stage3_eligible": stage3_eligible,
+        "has_fasting_glucose": has_fpg,
         "reason": reasons,
         "inputs_used": assessment["inputs_used"],
         "person": person_summary
@@ -494,159 +512,133 @@ def predict_stage3():
     if not isinstance(data, dict):
         return jsonify({"error": "Invalid request body: expected a JSON object."}), 400
 
-    # Accept raw 13 Stage 3 features or mapped patient profile from Stage 1/Stage 2
-    # 1. Age (sn256 or Age / age)
-    raw_age = data.get("sn256", data.get("Age", data.get("age")))
+    # 1. Age (Age / age / sn256)
+    raw_age = data.get("age", data.get("Age", data.get("sn256")))
     if raw_age is None or str(raw_age).strip() == "" or str(raw_age).strip().lower() == "null":
-        return jsonify({"error": "Missing required field: Age (sn256)"}), 400
+        return jsonify({"error": "Missing required field: Age"}), 400
     try:
         age_val = float(raw_age)
-        if age_val <= 0 or age_val > 130 or math.isnan(age_val):
-            return jsonify({"error": "Invalid value for Age: must be a positive number up to 130."}), 400
+        if isinstance(raw_age, bool) or age_val <= 0 or not math.isfinite(age_val):
+            return jsonify({"error": "Invalid value for Age: must be a positive number."}), 400
     except (ValueError, TypeError):
         return jsonify({"error": "Invalid value for Age: must be a numeric value."}), 400
 
-    # 2. Sex (sx060_r or Sex / sex): SHARE coding 1 = Male, 2 = Female
-    raw_sex = data.get("sx060_r", data.get("Sex", data.get("sex")))
+    # 2. Sex (Sex / sex / sx060_r): Male / Female or 1 / 2 / 0
+    raw_sex = data.get("sex", data.get("Sex", data.get("sx060_r")))
     if raw_sex is None or str(raw_sex).strip() == "" or str(raw_sex).strip().lower() == "null":
-        return jsonify({"error": "Missing required field: Sex (sx060_r)"}), 400
+        return jsonify({"error": "Missing required field: Sex"}), 400
     s_sex = str(raw_sex).strip().lower()
-    if s_sex in ("1", "1.0", "male", "m"):
-        sex_val = 1
-    elif s_sex in ("2", "2.0", "0", "0.0", "female", "f"):
-        sex_val = 2
+    if s_sex in ("1", "1.0", "male", "m", "man"):
+        sex_label = "Male"
+    elif s_sex in ("2", "2.0", "0", "0.0", "female", "f", "woman"):
+        sex_label = "Female"
     else:
         return jsonify({"error": "Invalid value for Sex: expected Male or Female."}), 400
 
-    # ---- Stage 3 eligibility safeguard (defense-in-depth) ----
-    # If the Stage 2 assessment recorded a diabetes-range laboratory finding
-    # (Rule 1: HbA1c >= 6.5% OR fasting glucose >= 126 mg/dL), future
-    # diabetes-development risk is NOT applicable. The protected Stage 3
-    # workflow passes the Stage 2 laboratory values here so the server
-    # independently enforces eligibility - it never trusts a client-supplied
-    # eligibility flag alone. Requests without laboratory values keep the
-    # existing backward-compatible behavior. The check runs before any Stage 3
-    # risk calculation.
-    raw_hba1c3 = data.get("hba1c")
-    s3_hba1c = None
-    if raw_hba1c3 is not None and str(raw_hba1c3).strip() not in ("", "null", "None"):
+    # 3. BMI (BMI / bmi)
+    raw_bmi = data.get("bmi", data.get("BMI"))
+    if raw_bmi is None or str(raw_bmi).strip() == "" or str(raw_bmi).strip().lower() == "null":
+        return jsonify({"error": "Missing required field: BMI"}), 400
+    try:
+        bmi_val = float(raw_bmi)
+        if isinstance(raw_bmi, bool) or bmi_val <= 0 or not math.isfinite(bmi_val):
+            return jsonify({"error": "Invalid value for BMI: must be a positive number."}), 400
+    except (ValueError, TypeError):
+        return jsonify({"error": "Invalid value for BMI: must be a numeric value."}), 400
+
+    # 4. Fasting Glucose (fasting_glucose_mgdl / fasting_glucose) - REQUIRED for Stage 3
+    raw_glu = data.get("fasting_glucose_mgdl") if "fasting_glucose_mgdl" in data else data.get("fasting_glucose")
+    if raw_glu is None or str(raw_glu).strip() in ("", "null", "none", "None"):
+        return jsonify({"error": "Fasting glucose is required to generate the approximately three-year diabetes-risk projection."}), 400
+    try:
+        glucose_val = float(raw_glu)
+        if isinstance(raw_glu, bool) or glucose_val <= 0 or not math.isfinite(glucose_val):
+            return jsonify({"error": "Invalid value for fasting glucose: must be a positive number."}), 400
+    except (ValueError, TypeError):
+        return jsonify({"error": "Invalid value for fasting glucose: must be a numeric value."}), 400
+
+    # 5. HbA1c (hba1c_pct / hba1c) - optional for Stage 3, checked for diagnostic range
+    raw_hba1c = data.get("hba1c_pct") if "hba1c_pct" in data else data.get("hba1c")
+    hba1c_val = None
+    if raw_hba1c is not None and str(raw_hba1c).strip() not in ("", "null", "none", "None"):
         try:
-            s3_hba1c = float(raw_hba1c3)
-            if math.isnan(s3_hba1c) or s3_hba1c < 0:
-                return jsonify({"error": "Invalid value for hba1c: must be a positive number."}), 400
+            hba1c_val = float(raw_hba1c)
+            if isinstance(raw_hba1c, bool) or hba1c_val <= 0 or not math.isfinite(hba1c_val):
+                return jsonify({"error": "Invalid value for HbA1c: must be a positive number."}), 400
         except (ValueError, TypeError):
-            return jsonify({"error": "Invalid value for hba1c: must be a numeric value."}), 400
+            return jsonify({"error": "Invalid value for HbA1c: must be a numeric value."}), 400
 
-    raw_glu3 = data.get("fasting_glucose_mgdl") if "fasting_glucose_mgdl" in data else data.get("fasting_glucose")
-    s3_glucose = None
-    if raw_glu3 is not None and str(raw_glu3).strip() not in ("", "null", "None"):
-        try:
-            s3_glucose = float(raw_glu3)
-            if math.isnan(s3_glucose) or s3_glucose < 0:
-                return jsonify({"error": "Invalid value for fasting glucose: must be a positive number."}), 400
-        except (ValueError, TypeError):
-            return jsonify({"error": "Invalid value for fasting glucose: must be a numeric value."}), 400
+    # 6. Diagnostic blocks: FPG >= 126 mg/dL or HbA1c >= 6.5%
+    if glucose_val >= 126.0 or (hba1c_val is not None and hba1c_val >= 6.5):
+        return jsonify({"error": "A diabetes-range laboratory result requires clinical confirmation; future-risk scoring is not appropriate."}), 400
 
-    if (s3_hba1c is not None and s3_hba1c >= ha.HBA1C_DIABETIC_THRESHOLD) or \
-       (s3_glucose is not None and s3_glucose >= ha.GLUCOSE_DIABETIC_THRESHOLD):
-        return jsonify({"error": "Diabetes-range result detected. Time-based diabetes development risk is not applicable. Please seek appropriate clinical evaluation."}), 400
+    # Recompute Stage 2 from its complete inputs. Client risk labels/eligibility
+    # flags cannot authorize scoring, and missing assessment inputs fail closed.
+    assessment_data = dict(data)
+    assessment_data.update(age=age_val, sex=sex_label, bmi=bmi_val,
+                           fasting_glucose=glucose_val, hba1c=hba1c_val)
+    assessment_data.pop("fasting_glucose_mgdl", None)
+    assessment_response, assessment_status = assess_stage2_request(assessment_data)
+    if assessment_status != 200:
+        return assessment_response, assessment_status
+    if not assessment_response.get_json()["stage3_eligible"]:
+        return jsonify({"error": "Stage 3 is unavailable for every High Stage 2 result. Please seek clinical evaluation."}), 400
 
-    # ---- Stage 3 eligibility: ANY Stage 2 HIGH result blocks (defense-in-depth) ----
-    # A final Stage 2 outcome of HIGH - from Rule 1, Rule 2, or Rule 4 - means
-    # time-based future diabetes risk is NOT applicable. The protected Stage 2
-    # workflow passes its final risk tier here (stage2_tier) so the server can
-    # independently enforce this, on top of the diabetes-range laboratory check
-    # above. Requests without a Stage 2 tier (e.g. a direct Stage 1 or
-    # standalone Stage 3 entry) keep the existing backward-compatible behavior.
-    raw_s2_tier = data.get("stage2_tier", data.get("final_risk_level", data.get("tier")))
-    if raw_s2_tier is not None and str(raw_s2_tier).strip().lower() == "high":
-        return jsonify({"error": "High-risk Stage 2 result detected. Time-based diabetes development risk is not applicable. Please seek appropriate clinical evaluation."}), 400
-
-    # Helper for condition indicators (1 = Yes, 0 = No)
-    def _parse_flag(field_primary: str, field_secondary: str, default: int = 0) -> int:
-        val = data.get(field_primary, data.get(field_secondary))
-        if val is None or str(val).strip() == "" or str(val).strip().lower() == "null":
-            return default
-        s = str(val).strip().lower()
-        if s in ("1", "1.0", "true", "yes"):
-            return 1
-        return 0
-
-    hyp = _parse_flag("sz101", "Hypertension")
-    heart = _parse_flag("sz103", "Heart_Disease")
-    stroke = _parse_flag("sz107", "Stroke")
-    chol = _parse_flag("sz124", "High_Cholesterol")
-
-    # Additional co-morbidities (default to 0 if not provided)
-    diabetes_hist = _parse_flag("sz105", "Diabetes_History", default=0)
-    lung_disease = _parse_flag("sz106", "Lung_Disease", default=0)
-    heart_failure = _parse_flag("sz104", "Heart_Failure", default=0)
-    arthritis = _parse_flag("sz108", "Arthritis", default=0)
-    cancer = _parse_flag("sz122", "Cancer", default=0)
-    kidney = _parse_flag("sz123", "Kidney_Disease", default=0)
-
-    # Condition count (sz080)
-    if "sz080" in data and data["sz080"] is not None and str(data["sz080"]).strip() != "" and str(data["sz080"]).strip().lower() != "null":
-        try:
-            cond_count = int(float(data["sz080"]))
-        except (ValueError, TypeError):
-            cond_count = hyp + heart + stroke + chol + diabetes_hist + lung_disease + heart_failure + arthritis + cancer + kidney
-    else:
-        cond_count = hyp + heart + stroke + chol + diabetes_hist + lung_disease + heart_failure + arthritis + cancer + kidney
-
-    # Assemble exact 13 required features for Stage 3
-    s3_patient = {
-        'sn256': age_val,
-        'sx060_r': sex_val,
-        'sz101': hyp,
-        'sz105': diabetes_hist,
-        'sz106': lung_disease,
-        'sz103': heart,
-        'sz104': heart_failure,
-        'sz107': stroke,
-        'sz108': arthritis,
-        'sz122': cancer,
-        'sz123': kidney,
-        'sz124': chol,
-        'sz080': cond_count,
+    # 7. Model evaluation via unified Rich 3-year model
+    profile = {
+        "age": age_val,
+        "sex": sex_label.lower(),
+        "bmi": bmi_val,
+        "fpg_mg_dl": glucose_val
     }
+    if hba1c_val is not None:
+        profile["hba1c_pct"] = hba1c_val
 
     try:
-        raw_result = p_s3.predict_stage3_risk(s3_patient)
-    except Exception as e:
-        return jsonify({"error": f"Stage 3 prediction error: {str(e)}"}), 500
+        result = unified_s3.predict(profile)
+    except S3NotApplicableError as e:
+        return jsonify({"error": str(e)}), 400
+    except S3OutsideEvidenceError as e:
+        return jsonify({"error": str(e)}), 400
+    except (ValueError, TypeError) as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception:
+        return jsonify({"error": "An unexpected error occurred during Stage 3 risk calculation."}), 500
 
-    risk_prob = raw_result["risk_probability"]
-    risk_pct = raw_result["risk_percentage"]
-
-    # Genuine discrete-time survival horizons: strictly 1-Year and 2-Year risk
-    horizons = raw_result.get("time_horizons", {})
-    r1 = horizons.get("1_year", {}).get("probability", raw_result.get("risk_probability_1yr", 0.0))
-    p1_pct = horizons.get("1_year", {}).get("percentage", raw_result.get("risk_percentage_1yr", 0.0))
-    r2 = horizons.get("2_year", {}).get("probability", raw_result.get("risk_probability_2yr", risk_prob))
-    p2_pct = horizons.get("2_year", {}).get("percentage", raw_result.get("risk_percentage_2yr", risk_pct))
+    p3_val = float(result["risk_probability"]["3_year"])
+    pct3_val = p3_val * 100
+    if p3_val < 0.01:
+        category = "Lower estimated risk"
+        next_step = "Continue prevention and follow clinical advice on repeat screening."
+    elif p3_val < 0.05:
+        category = "Increased risk"
+        next_step = "Discuss your risk factors and a prevention plan with a healthcare professional."
+    else:
+        category = "Elevated risk"
+        next_step = "Arrange a clinical review to discuss prevention and follow-up."
 
     response_data = {
-        "risk_probability": risk_prob,
-        "risk_percentage": risk_pct,
+        "risk_category": category,
+        "next_step": next_step,
+        "risk_probability": p3_val,
+        "risk_percentage": pct3_val,
         "time_horizons": {
-            "1_year": {
-                "probability": round(float(r1), 4),
-                "percentage": round(float(p1_pct), 2)
-            },
-            "2_year": {
-                "probability": round(float(r2), 4),
-                "percentage": round(float(p2_pct), 2)
+            "3_year": {
+                "probability": p3_val,
+                "percentage": pct3_val,
+                "evidence_scope": "research_internal_validation_only"
             }
         },
+        "model_used": "unified_rich_3y",
+        "reliability": result.get("reliability", "supported"),
+        "warnings": result.get("warnings", []),
+        "interpretation": "Estimated probability of developing diabetes within approximately three years.",
         "features_evaluated": {
             "Age": age_val,
-            "Sex": "Male" if sex_val == 1 else "Female",
-            "Hypertension": "Yes" if hyp == 1 else "No",
-            "High_Cholesterol": "Yes" if chol == 1 else "No",
-            "Heart_Disease": "Yes" if heart == 1 else "No",
-            "Stroke": "Yes" if stroke == 1 else "No",
-            "Chronic_Condition_Count": cond_count
+            "Sex": sex_label,
+            "BMI": bmi_val,
+            "Fasting_Glucose": f"{glucose_val:.1f} mg/dL",
+            "HbA1c": f"{hba1c_val:.1f}%" if hba1c_val is not None else "Not provided"
         }
     }
 

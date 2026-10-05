@@ -3,7 +3,8 @@
 
     function readRecords() {
         try {
-            return JSON.parse(localStorage.getItem(storageKey)) || [];
+            const records = JSON.parse(localStorage.getItem(storageKey));
+            return Array.isArray(records) ? records : [];
         } catch (error) {
             return [];
         }
@@ -238,6 +239,13 @@
     // diabeta_last_result to display the outcome - it must not write a
     // second copy into diabetaRecords.
     renderRecords();
+
+    window.addEventListener('storage', event => {
+        if (!event.key || event.key === storageKey) {
+            closeRecordModal();
+            renderRecords();
+        }
+    });
 
     document.querySelector("[data-download-current]")?.addEventListener("click", () => {
         if (window.DIABETA_RESULT) downloadRecord(window.DIABETA_RESULT);
