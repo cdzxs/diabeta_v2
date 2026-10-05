@@ -1,9 +1,14 @@
 # Publication provenance and permission findings
 
-Reviewed 2026-10-05. **Required-model redistribution remains unresolved.**
-The owner explicitly cannot confirm permission yet. Possession, a Git commit,
-model parameters, dataset access, or AI assistance is not a permission grant.
-The sibling publication folder is a local candidate, not approved for upload.
+Updated 2026-10-05. **Owner authorship statement recorded; no conflicting
+third-party claim or applicable publication prohibition identified in the reviewed
+records.** The owner states: "These models and project-specific training/inference
+code were developed for my DiaBeta project with ChatGPT assistance."
+This is the owner's statement, not an independent authorship certification or a
+new license grant. It supersedes the earlier uncertainty about an unidentified
+supplier. A ZIP created or delivered during project work does not establish an
+external supplier. The owner has authorized publication of the reviewed update.
+No project license is selected; browser verification remains pending.
 
 ## Active Stage 1 model and code
 
@@ -24,7 +29,8 @@ Affected files: `DPM/models/stage1_v2_model.pkl`,
   that the baseline training script alone produced the active bytes.
 - The diagnostic report describes a separately saved candidate and the validation
   report names that candidate. The exact candidate-to-active promotion and the
-  human author/permission chain are not recorded sufficiently to establish rights.
+  training promotion are not fully documented for exact reproduction. This is a
+  reproducibility gap, not evidence of conflicting third-party ownership.
 - No author/license/provenance field was found in the loaded pipeline's top-level
   metadata. No project license or permission file exists in the 28 reachable commits.
 - Dataset: public-use NHANES 2013-14, 2015-16 and 2017-18, as identified by the
@@ -116,22 +122,24 @@ They concern a different model, and the training script contains a local
 workstation-specific dataset path. Original files and the initial copied versions
 are preserved locally; no retired training was run.
 
-## Exact information still needed from the owner
+## Current evidence assessment
 
-1. For Stage 1: identify the original authors of the training/diagnostic code and
-   fitted model, confirm whether the Git-attributed contributor owns those rights,
-   and provide the applicable license or written permission allowing public
-   distribution of both source and serialized weights, including any employer or
-   institutional restrictions. Supply the candidate promotion/training provenance
-   record if available.
-2. For Stage 3: identify who delivered/created the ZIP, its original source URL
-   or agreement, and a license or explicit rights-holder permission covering the
-   fitted weights, inference and training code. Identify any additional source
-   code/assets incorporated by that supplier. A statement that the cohort is open
-   is not a substitute.
-3. Once contributions are cleared, decide the project's own license. No license
-   has been chosen on the owner's behalf. Optional original photos/logo need no
-   clearance for this stripped copy; permissions are needed only to restore them.
+The Git contributor attribution, project source, model metadata and ZIP inspection
+provide no concrete conflicting third-party authorship claim for the active models
+or project-specific training/inference code. Missing standalone permission files
+are not treated as evidence of an external supplier or as a requirement to obtain
+permission from a hypothetical party. The owner's statement supplies the previously
+missing project-development context; it does not transfer ownership of NHANES or
+Rich Healthcare data and does not license upstream software.
 
-Until items 1 and 2 are resolved, the required artifacts remain in the local
-candidate solely for testing and the publication verdict remains **Not ready**.
+NCHS statistical-use/non-identification conditions and Dryad CC0 terms were
+rechecked against the linked official sources. No term reviewed specifically bars
+this research-model/code publication. Raw data and record-level outputs remain
+excluded from the latest tree; their existing remote history remains intact at
+the owner's instruction. The concrete Getty rights evidence concerns an excluded
+image, not the active models. Upstream dependency terms remain applicable.
+
+Remaining limitations: missing source workbook and exact training/promotion
+provenance, internal evaluation/IPCW limitations, no model privacy certification,
+and pending browser verification. These are documented limitations, not an
+invented permission requirement. No project reuse license has been chosen.

@@ -1,5 +1,28 @@
 # DiaBeta 2.0 local publication review
 
+## Owner statement and publication decision (2026-10-05)
+
+**Current verdict: Ready with stated limitations.** This decision supersedes
+the permission-blocker verdicts preserved below. The owner states that the models
+and project-specific training/inference code were developed for DiaBeta with
+ChatGPT assistance and authorizes the normal update to origin/main. The ZIP is
+project-development provenance, not evidence of an external supplier. Review of
+the recorded Git attribution, source, metadata, archive findings and official
+dataset terms found no conflicting third-party authorship claim or applicable
+prohibition on publishing this research model/code. Missing standalone grants
+are not a blocker in the absence of contrary evidence and with that statement.
+See PUBLICATION_PROVENANCE.md for the evidence and limits of this conclusion.
+
+The reviewed application commit 555a3f91d5b4425f0a384985e6ab330a51080d9a
+is preserved unchanged. A separate documentation follow-up records this statement
+and corrects superseded permission conclusions. No model/code/threshold change,
+project license, history rewrite or force-push is part of this follow-up.
+Browser verification remains pending; no visual pass is claimed. Missing original
+workbook/training provenance, internal OOF/IPCW limitations, unassessed model privacy
+and retained historical data remain documented. No clinical validation is claimed.
+
+The sections below retain the prior audit chronology and its then-current decisions.
+
 ## Current release checkout review (2026-10-05)
 
 This section supersedes the older folder/status descriptions below. A fresh clone

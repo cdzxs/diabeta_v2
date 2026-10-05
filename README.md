@@ -87,9 +87,11 @@ Stage 1/2 use a non-laboratory model developed with NHANES data plus project rul
 
 ## Publication candidate status
 
-This standalone `diabeta_v2_publication` copy contains no inherited .git history.
-It is local and **not approved for publication**: required model/code permissions
-remain unresolved and browser verification is pending. See PRE_COMMIT_REVIEW.md,
+This release uses the verified lightweight publication files. The existing GitHub
+repository history is retained; removing data from the latest tree does not erase
+historical copies. The separate local publication folder itself has no .git history.
+The owner has authorized publication and recorded project authorship with ChatGPT
+assistance. Browser verification remains pending. See PRE_COMMIT_REVIEW.md,
 PUBLICATION_PROVENANCE.md and MANUAL_BROWSER_CHECKLIST.md.
 
 Original photographs/logo and personal team content are excluded; simple original

@@ -3,9 +3,10 @@
 Reviewed 2026-10-05. This inventory does not select a license for DiaBeta.
 See [PUBLICATION_PROVENANCE.md](PUBLICATION_PROVENANCE.md) for the subsequent
 file-by-file investigation, Git attribution, archive checks and exact outstanding
-permissions. Required Stage 1 and Stage 3 redistribution remains unconfirmed.
-No project LICENSE was found. The owner must confirm authorship/permission and
-decide the project's licensing before offering reuse rights.
+findings. The owner states that the models and project-specific training/inference
+code were developed for DiaBeta with ChatGPT assistance. No conflicting
+third-party claim was found in the reviewed records. No project LICENSE has been
+selected; publication does not constitute a new project reuse license.
 
 ## Data-derived models
 
@@ -41,13 +42,13 @@ Runtime dependencies are installed from their upstream distributions, not
 vendored. Their installed license metadata/notices remain applicable; no
 project license replaces those terms. The installation uses Flask, flask-cors,
 joblib, NumPy, pandas, scikit-learn, SciPy, threadpoolctl and their dependencies.
-The frontend requests Inter and Playfair Display from Google Fonts; font files
-are not bundled. This also means the default pages are not fully offline.
+The publication frontend uses system-font fallbacks; external Google Fonts
+requests and bundled font files are absent.
 
 The original repository retains eleven raster images with unresolved rights.
 care-team.jpg has an embedded Getty Images rights-statement URL; that is not a
 license grant. All eleven are omitted from the sibling publication copy, which
 uses original SVG placeholders and omits personal team content/contact links.
 External font requests are also omitted from that copy. No original is deleted.
-Do not infer permission from file presence. Authorship and distribution permission
-for required supplied model/training code remain open; see the provenance review.
+Do not infer permission from file presence. The owner's project authorship
+statement and the concrete third-party findings are recorded in the provenance review.
