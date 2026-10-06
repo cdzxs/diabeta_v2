@@ -142,7 +142,10 @@ model artifacts, inference, backend/frontend code, runtime dependencies, tests,
 research evidence and permission notices. It contains no CSV/XPT/XLSX data,
 patient export/database, environment, cache, backup, delivery ZIP or .git history.
 
-Eleven original raster assets are excluded. The exact paths and evidence are in
+The initial cleanup excluded eleven original raster assets. The homepage restoration
+returned diabeta-logo.png, clinical-ai-hero.png and care-team.jpg. The team restoration
+returned profile-photo.png, muna.jpeg and kenneth.png from commit 514be70.
+The original audit evidence is in
 [PUBLICATION_PROVENANCE.md](PUBLICATION_PROVENANCE.md). `care-team.jpg` contains
 an XMP rights-statement URL pointing to Getty Images; no corresponding permission
 grant/invoice was found. Other assets have no substantiated redistribution evidence.
@@ -151,9 +154,11 @@ Git image-upload commits and metadata markers do not establish rights.
 New `frontend/publication-mark.svg` and `frontend/publication-illustration.svg`
 use simple original geometric shapes. They do not trace or embed excluded images.
 HTML/CSS references were updated; two initially broken CSS replacement references
-were corrected and the final link scan passes. Personal portraits, biographies,
-contact email links and external font requests are omitted from the copy.
-The About Project page remains navigable. The original frontend is preserved.
+were corrected and the final link scan passes. At the owner's request, about_me.html
+now contains the original team biographies, portraits and contact links; its original
+Google Fonts link is restored, as is the homepage's. The existing Meet the Team
+link in about.html leads to the restored page. Assessment and privacy corrections
+remain in place.
 
 Optional `backend/model/race_map.pkl` is omitted; tested built-in labels are used.
 Retired Stage 3 training source/metadata/report are omitted, including a

@@ -80,10 +80,12 @@ MODEL_CARD.md and output/validation_report.json.
 - No raw participant datasets or row-level prediction exports are included in
   the candidate. Their removal does not itself clear fitted-model rights/privacy.
 
-## Optional assets excluded from the publication copy
+## Optional assets: original cleanup and subsequent restorations
 
-All eleven raster assets are retained in the original repository but omitted
-from the sibling copy. Git records additions/updates with generic image/UI commit
+The initial cleanup omitted eleven raster assets. The current application has
+since restored six assets from commit 514be70 at the owner's request, as noted below.
+The separate sibling publication copy has not been updated by these restorations.
+Git records additions/updates with generic image/UI commit
 messages, not rights grants. PNG text metadata supplied no license evidence.
 
 | Exact original path | Evidence / resolution in publication copy |
@@ -91,25 +93,27 @@ messages, not rights grants. PNG text metadata supplied no license evidence.
 | frontend/ai-healthcare.jpg | No permission record found; omitted |
 | frontend/background.jpg | No permission record found; reference replaced with original SVG |
 | frontend/care-network.jpg | No permission record found; reference replaced with original SVG |
-| frontend/care-team.jpg | XMP rights statement links to Getty Images EULA; no invoice/license grant found; omitted |
-| frontend/clinical-ai-hero.png | No permission record found; replaced with original SVG |
-| frontend/diabeta-logo.png | No author/license record found; replaced with original geometric mark |
+| frontend/care-team.jpg | Restored to current application for homepage; original audit found Getty Images rights URL without invoice/license grant |
+| frontend/clinical-ai-hero.png | Restored to current application for homepage |
+| frontend/diabeta-logo.png | Restored to current application for homepage and team page |
 | frontend/health-background.jpg | No permission record found; reference replaced with original SVG |
-| frontend/kenneth.png | Portrait, rights/consent unconfirmed; omitted |
-| frontend/muna.jpeg | Portrait, rights/consent unconfirmed; omitted |
+| frontend/kenneth.png | Original supervisor portrait restored at owner's request |
+| frontend/muna.jpeg | Original researcher portrait restored at owner's request |
 | frontend/physician-analytics.jpg | EXIF marker present; no licensing evidence found; replaced with original SVG |
-| frontend/profile-photo.png | Portrait, rights/consent unconfirmed; omitted |
+| frontend/profile-photo.png | Original creator/developer portrait restored at owner's request |
 
 The [Getty Images agreement](https://www.gettyimages.com/eula) distinguishes a
 license from mere download and restricts standalone redistribution. An embedded
 rights URL is not proof of a purchased license or permission to place the raw
-image in a public repository. No claim of infringement is made; the copy simply
-excludes the asset. No existing images were edited or deleted.
+image in a public repository. No claim of infringement is made. This records the
+original audit evidence; care-team.jpg has since been restored at the owner's request.
 
-`frontend/about_me.html` is replaced in the copy with a neutral project page;
-personal biographies, portraits and contact links are omitted. The contact email
-link in `frontend/about.html` is also omitted. External Google Fonts requests
-are removed from the copy, using existing system-font fallbacks. Replacements
+`frontend/about_me.html` in the current application is restored from commit 514be70,
+including its original biographies, three portraits, contact links and Google Fonts
+link. The existing Meet the Team navigation in about.html remains connected.
+The separate sibling publication copy retains the initial neutral project page.
+The contact email link in `frontend/about.html` remains omitted. The homepage's
+original Google Fonts link was also restored. Replacements
 `frontend/publication-mark.svg` and `frontend/publication-illustration.svg` are
 new, simple geometric code written for this task, not traced from original assets.
 This does not select an overall project license or clear unrelated code rights.
@@ -136,8 +140,8 @@ NCHS statistical-use/non-identification conditions and Dryad CC0 terms were
 rechecked against the linked official sources. No term reviewed specifically bars
 this research-model/code publication. Raw data and record-level outputs remain
 excluded from the latest tree; their existing remote history remains intact at
-the owner's instruction. The concrete Getty rights evidence concerns an excluded
-image, not the active models. Upstream dependency terms remain applicable.
+the owner's instruction. The concrete Getty rights evidence concerns the restored
+homepage image care-team.jpg, not the active models. Upstream dependency terms remain applicable.
 
 Remaining limitations: missing source workbook and exact training/promotion
 provenance, internal evaluation/IPCW limitations, no model privacy certification,

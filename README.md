@@ -94,8 +94,10 @@ The owner has authorized publication and recorded project authorship with ChatGP
 assistance. Browser verification remains pending. See PRE_COMMIT_REVIEW.md,
 PUBLICATION_PROVENANCE.md and MANUAL_BROWSER_CHECKLIST.md.
 
-Original photographs/logo and personal team content are excluded; simple original
-SVGs replace image references. External fonts are removed. The optional race-map
+The original homepage logo/images and team biographies, portraits and contact
+links have been restored from commit 514be70 at the owner's request. The homepage
+and team page load their original Google Fonts. Other cleanup image replacements
+remain in place. The optional race-map
 pickle is omitted; the backend uses its built-in labels. Models/rules are unchanged.
 Historical research scripts may need data available only in the original workspace.
 No Git operation is needed to run this copy. Do not publish the original history.
