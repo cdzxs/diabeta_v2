@@ -1,7 +1,7 @@
 # Sources, attribution, and unresolved permissions
 
 Reviewed 2026-10-05. This inventory does not select a license for DiaBeta.
-See [PUBLICATION_PROVENANCE.md](PUBLICATION_PROVENANCE.md) for the subsequent
+See [PUBLICATION\_PROVENANCE.md](PUBLICATION_PROVENANCE.md) for the subsequent
 file-by-file investigation, Git attribution, archive checks and exact outstanding
 findings. The owner states that the models and project-specific training/inference
 code were developed for DiaBeta with ChatGPT assistance. No conflicting
@@ -32,7 +32,7 @@ absent, so its reported hash has not been matched to a newly downloaded source.
 The active artifact does match the locally supplied candidate byte-for-byte.
 
 Raw participant datasets, row-level prediction exports, and historical backup
-models are not intended release files. See PRE_COMMIT_REVIEW.md for existing
+models are not intended release files. See PRE\_COMMIT\_REVIEW.md for existing
 index/history exceptions. Model serialization is not proof of anonymization;
 no membership-inference or model-inversion assessment was performed.
 
@@ -52,3 +52,10 @@ uses original SVG placeholders and omits personal team content/contact links.
 External font requests are also omitted from that copy. No original is deleted.
 Do not infer permission from file presence. The owner's project authorship
 statement and the concrete third-party findings are recorded in the provenance review.
+
+The current frontend/stage3.html requests Inter and Playfair Display
+
+from Google Fonts. Font files are not bundled; loading these fonts
+
+requires internet access.
+
