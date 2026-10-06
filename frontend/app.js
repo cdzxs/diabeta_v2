@@ -110,6 +110,7 @@
             overlay.classList.remove('open');
             drawer.setAttribute('aria-hidden', 'true');
             toggle.setAttribute('aria-expanded', 'false');
+            toggle.setAttribute('aria-label', 'Open navigation menu');
             document.body.classList.remove('drawer-open');
         };
 
@@ -118,10 +119,14 @@
             overlay.classList.add('open');
             drawer.setAttribute('aria-hidden', 'false');
             toggle.setAttribute('aria-expanded', 'true');
+            toggle.setAttribute('aria-label', 'Close navigation menu');
             document.body.classList.add('drawer-open');
         };
 
-        toggle.addEventListener('click', openDrawer);
+        toggle.addEventListener('click', () => {
+            if (toggle.getAttribute('aria-expanded') === 'true') closeDrawer();
+            else openDrawer();
+        });
         closeBtn?.addEventListener('click', closeDrawer);
         overlay.addEventListener('click', closeDrawer);
         drawer.querySelectorAll('a, button').forEach((link) => link.addEventListener('click', closeDrawer));

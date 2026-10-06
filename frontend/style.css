@@ -3681,6 +3681,24 @@ select:focus {
     stroke: var(--accent) !important;
 }
 
+/* One visible hamburger for both legacy span and SVG menu buttons. */
+.nav-toggle > span,
+.nav-toggle > svg {
+    display: none !important;
+}
+
+.nav-toggle::before {
+    content: "";
+    display: block;
+    width: 24px;
+    height: 18px;
+    background:
+        linear-gradient(#0e2f56, #0e2f56) center top / 24px 2px no-repeat,
+        linear-gradient(#0e2f56, #0e2f56) center center / 24px 2px no-repeat,
+        linear-gradient(#0e2f56, #0e2f56) center bottom / 24px 2px no-repeat;
+    pointer-events: none;
+}
+
 @media (max-width: 820px) {
     .site-shell,
     .result-shell,
